@@ -16,7 +16,7 @@ export default function Login() {
   ];
 
   const handleGoogleLogin = () => router.push("/home");
-  const handleGuestLogin = () => router.push("/guest");
+  const handleGuestLogin = () => router.push("/profile");
 
   useEffect(() => {
     const interval = setInterval(() => {
