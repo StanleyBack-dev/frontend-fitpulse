@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { useEffect, useState } from "react";
+import LoginButton from "./components/LoginButton";
 import styles from "./page.module.css";
 
 export default function Login() {
@@ -15,7 +16,6 @@ export default function Login() {
     "Conecte. Explore. Cresça. 🌐",
   ];
 
-  const handleGoogleLogin = () => router.push("/home");
   const handleGuestLogin = () => router.push("/profile");
 
   useEffect(() => {
@@ -54,10 +54,7 @@ export default function Login() {
         </div>
 
         <div className={styles.buttonGroup}>
-          <button className={styles.googleBtn} onClick={handleGoogleLogin}>
-            <FcGoogle size={24} style={{ marginRight: 8 }} />
-            Entrar com Google
-          </button>
+          <LoginButton />
 
           <button className={styles.guestBtn} onClick={handleGuestLogin}>
             Apenas Entrar

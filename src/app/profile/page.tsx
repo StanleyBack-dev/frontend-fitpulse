@@ -8,15 +8,20 @@ import {
   FiArrowLeft,
   FiCheck,
 } from "react-icons/fi";
+import { useSearchParams } from "next/navigation";
 import styles from "./profile.module.css";
 
 export default function ProfileForm() {
   const [step, setStep] = useState(1);
   const [slideIndex, setSlideIndex] = useState(0);
+  const searchParams = useSearchParams();
+  const initialName = searchParams.get("name") || "";
+  const initialEmail = searchParams.get("email") || "";
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
-    name: "",
+    const [formData, setFormData] = useState({
+    name: initialName,
+    email: initialEmail,
     enterprise: "",
     position: "",
     phone: "",
@@ -26,7 +31,7 @@ export default function ProfileForm() {
     twitter: "",
     isOnline: true,
     isAvailableForNetworking: true,
-  });
+    });
 
     const slides = [
     "Monte seu perfil em segundos e destaque-se 🚀",
@@ -169,6 +174,16 @@ export default function ProfileForm() {
             {/* ETAPA 2 */}
             {step === 2 && (
               <div className={styles.tabContent}>
+                <div className={styles.inputGroup}>
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="seuemail@exemplo.com"
+                  />
+                </div>
                 <div className={styles.inputGroup}>
                   <label>Telefone</label>
                   <input
