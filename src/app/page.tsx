@@ -1,66 +1,87 @@
+"use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { FcGoogle } from "react-icons/fc";
+import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default function Login() {
+  const router = useRouter();
+  const [index, setIndex] = useState(0);
+
+  const slides = [
+    "O futuro do networking está aqui 🚀",
+    "Cada conexão começa com um pulso 💜",
+    "Conecte. Explore. Cresça. 🌐",
+  ];
+
+  const handleGoogleLogin = () => {
+    console.log("Login com Google");
+    router.push("/home");
+  };
+
+  const handleGuestLogin = () => {
+    console.log("Entrar sem autenticação");
+    router.push("/guest");
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, 3500); // muda de frase a cada 3,5 segundos
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <div className={styles.container}>
+      <div className={styles.content}>
         <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
+          src="/logo-pulse.png"
+          alt="Logo PULSE"
+          width={180}
+          height={180}
           priority
+          className={styles.logo}
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <h1 className={styles.title}>Conecte-se ao PULSE</h1>
+
+        <div className={styles.sliderWrapper}>
+          <div
+            className={styles.slider}
+            style={{ transform: `translateX(-${index * 100}%)` }}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {slides.map((text, i) => (
+              <div key={i} className={styles.slide}>
+                {text}
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
+
+        <button className={styles.googleBtn} onClick={handleGoogleLogin}>
+          <FcGoogle size={24} style={{ marginRight: 8 }} />
+          Entrar com Google
+        </button>
+
+        <button className={styles.guestBtn} onClick={handleGuestLogin}>
+          Apenas Entrar
+        </button>
+      </div>
+
+      <footer className={styles.footer}>
+        <p className={styles.termsText}>
+          Ao continuar, você concorda com os{" "}
+          <a href="/termos-de-uso" className={styles.link}>
+            Termos de Uso
+          </a>{" "}
+          e a{" "}
+          <a href="/politica-de-privacidade" className={styles.link}>
+            Política de Privacidade
+          </a>{" "}
+          do PULSE.
+        </p>
+      </footer>
     </div>
   );
 }
