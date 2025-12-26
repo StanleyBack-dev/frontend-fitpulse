@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkSession } from "@/app/services/authService";
+import { checkSession } from "@/services/authService";
 
 export const useAuthRedirect = () => {
   const router = useRouter();
@@ -13,7 +13,7 @@ export const useAuthRedirect = () => {
         if (authenticated) {
           router.push("/events");
         } else {
-          setIsLoading(false); // Só para de carregar se NÃO estiver logado
+          setIsLoading(false);
         }
       } catch (err) {
         setIsLoading(false);

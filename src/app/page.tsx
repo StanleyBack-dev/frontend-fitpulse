@@ -2,15 +2,15 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useAuthRedirect } from "@/app/hooks/useAuth";
-import LoginButton from "@/app/components/LoginButton";
+import { useAuthRedirect } from "@/hooks/useAuth";
+import LoginButton from "../components/LoginButton";
+import LoadingScreen from "../components/LoadingScreen/index";
 import styles from "./page.module.css";
 
 export default function Login() {
-  // Chamada do hook que verifica a sessão
   const { isLoading } = useAuthRedirect();
-
   const [index, setIndex] = useState(0);
+  
   const slides = [
     "O futuro do networking está aqui 🚀",
     "Cada conexão começa com um pulso 💜",
@@ -24,21 +24,8 @@ export default function Login() {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  // Enquanto estiver verificando se o usuário está logado, 
-  // não mostramos nada (ou um spinner) para evitar o flash da tela de login
   if (isLoading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        background: '#000',
-        color: '#fff' 
-      }}>
-        Carregando...
-      </div>
-    );
+    return <LoadingScreen message="Verificando sua conexão..." />;
   }
 
   return (
