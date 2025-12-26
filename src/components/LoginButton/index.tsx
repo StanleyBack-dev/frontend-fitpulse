@@ -5,7 +5,7 @@ import styles from "../../app/page.module.css";
 
 export default function LoginButton() {
   const handleLogin = () => {
-    const redirectUri = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/callback`;
+    const redirectUri = `${process.env.NEXT_PUBLIC_API_URL}api/auth/callback`;
     const scope = encodeURIComponent("profile email");
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const responseType = "code";
