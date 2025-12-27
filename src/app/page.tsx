@@ -58,7 +58,7 @@ export default function Login() {
           <LoginButton />
           <button 
             className={styles.guestBtn} 
-            onClick={() => (window.location.href = "/profile")}
+            onClick={() => (window.location.href = "/home")}
           >
             Apenas Entrar
           </button>
