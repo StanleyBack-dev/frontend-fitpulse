@@ -28,26 +28,27 @@ export default function HomePage() {
   return (
     <main className={styles.screenContainer}>
       
-      {/* CAMADA 1: O MUNDO (MAPA) */}
-      {/* Fica no fundo absoluto. O zoom acontece AQUI dentro. */}
+      {/* 1. MAPA */}
       <div className={styles.layerMap}>
         <MapPage />
       </div>
 
-      {/* CAMADA 2: A INTERFACE (HUD, TICKER) */}
-      {/* Cobre a tela toda, mas deixa o clique passar para o mapa */}
+      {/* 2. INTERFACE (Com as novas classes Wrapper) */}
       <div className={styles.layerInterface}>
-        <div className={styles.safeAreaTopRight}>
+        
+        {/* Wrapper do HUD */}
+        <div className={styles.hudWrapper}>
              <EventHUD data={mockEventData} />
         </div>
         
-        <div className={styles.safeAreaBottom}>
+        {/* Wrapper do Ticker */}
+        <div className={styles.tickerWrapper}>
              <SponsorTicker />
         </div>
+
       </div>
 
-      {/* CAMADA 3: O MENU E MODAIS */}
-      {/* Fica acima de tudo e bloqueia cliques quando aberto */}
+      {/* 3. MENU */}
       <div className={styles.layerOverlay}>
         <SideMenu />
       </div>
