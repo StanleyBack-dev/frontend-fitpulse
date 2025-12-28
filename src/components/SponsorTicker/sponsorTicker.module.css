@@ -14,9 +14,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  z-index: 35; /* Menor que o HUD e Menu, mas acima do mapa */
+  z-index: 900; /* Menor que o HUD e Menu, mas acima do mapa */
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   transition: all 0.3s ease; /* Animação suave se mudar de posição */
+  transform: translateZ(0);
 }
 
 .label {
@@ -55,20 +56,12 @@
 
 /* --- AJUSTE ESTRATÉGICO PARA MOBILE --- */
 @media (max-width: 768px) {
-  .tickerContainer {
-    /* Reseta as propriedades de posicionamento do Desktop */
+.tickerContainer {
+    top: 20px;
+    right: 20px;
     bottom: auto;
     left: auto;
-    transform: none;
-
-    /* Nova Posição: Topo Direito */
-    top: 20px;
-    right: 20px; 
-
-    /* Ajustes Visuais para Mobile (Ocupar menos espaço) */
-    padding: 6px 16px;
-    border-radius: 12px; /* Menos arredondado para encaixar no canto */
-    background: rgba(15, 10, 30, 0.8); /* Um pouco mais escuro para leitura */
+    transform: none; /* Remove transform para evitar conflitos de posição */
   }
 
   /* Diminuir um pouco o texto e logo no celular */

@@ -1,14 +1,14 @@
+/* home.module.css */
 .container {
-  width: 100vw;
+  position: relative;
+  width: 100%;
   height: 100vh;
-  background-color: #000;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
+  background-color: #000;
 }
 
-/* área que contém o mapa principal */
 .mapSection {
-  flex: 1;
-  position: relative;
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* FORÇA O MAPA A FICAR NO CHÃO */
 }
