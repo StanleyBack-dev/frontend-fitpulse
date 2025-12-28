@@ -11,7 +11,7 @@ export const useAuthRedirect = () => {
       try {
         const { authenticated } = await checkSession();
         if (authenticated) {
-          router.push("/events");
+          router.push("/home");
         } else {
           setIsLoading(false);
         }
