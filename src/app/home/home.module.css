@@ -1,14 +1,96 @@
-/* home.module.css */
-.container {
+/* Container que trava a tela (sem scroll no body) */
+.screenContainer {
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
+  height: 100svh; /* Fix para mobile moderno */
   overflow: hidden;
   background-color: #000;
 }
 
-.mapSection {
+/* =========================================
+   CAMADA 1: MAPA (Z-INDEX 0)
+   ========================================= */
+.layerMap {
+  position: absolute;
+  inset: 0; /* top, left, right, bottom: 0 */
+  z-index: 0;
+}
+
+.loading {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* =========================================
+   CAMADA 2: INTERFACE (Z-INDEX 10)
+   ========================================= */
+.layerInterface {
   position: absolute;
   inset: 0;
-  z-index: 0; /* FORÇA O MAPA A FICAR NO CHÃO */
+  z-index: 10;
+  
+  /* MÁGICA: Permite clicar no mapa "através" desta camada */
+  pointer-events: none; 
+  
+  /* Organização Flexbox para posicionar os filhos */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Espalha verticalmente */
+  padding: 20px;
+}
+
+/* Áreas seguras para os componentes */
+/* IMPORTANTE: Os filhos precisam reativar o clique! */
+
+.safeAreaTopRight {
+  display: flex;
+  justify-content: flex-end; /* Joga o HUD para a direita */
+  pointer-events: auto; /* Reativa clique no HUD */
+}
+
+.safeAreaBottom {
+  display: flex;
+  justify-content: center; /* Centraliza o Ticker */
+  pointer-events: auto; /* Reativa clique no Ticker */
+  margin-bottom: 10px;
+}
+
+/* =========================================
+   CAMADA 3: OVERLAYS (Z-INDEX 20)
+   ========================================= */
+.layerOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Não definimos width/height full aqui para não bloquear o mapa */
+  /* O SideMenu já tem suas próprias regras de overlay */
+  z-index: 20;
+}
+
+/* =========================================
+   MEDIA QUERY: AJUSTE MOBILE
+   ========================================= */
+@media (max-width: 768px) {
+  .layerInterface {
+    padding: 10px;
+  }
+
+  /* No Mobile, invertemos a ordem visual se necessário */
+  .safeAreaTopRight {
+    /* HUD vai para baixo no mobile? */
+    /* Se quiser manter no topo, deixe como está. */
+    /* Se quiser mover, use order no flexbox */
+  }
+  
+  .safeAreaBottom {
+    /* Ticker sobe no mobile? */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+  }
 }

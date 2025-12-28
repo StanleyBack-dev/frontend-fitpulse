@@ -1,9 +1,5 @@
 .tickerContainer {
-  position: fixed;
-  /* Posição Padrão (Desktop): Embaixo e Centralizado */
-  bottom: 30px; /* Subi um pouco para dar ar */
-  left: 50%;
-  transform: translateX(-50%);
+
   
   /* Visual */
   background: rgba(15, 10, 30, 0.6);

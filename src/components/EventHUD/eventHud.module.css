@@ -1,7 +1,4 @@
 .hudContainer {
-  position: fixed;
-  top: 20px;
-  right: 20px;
   width: 300px;
   background: rgba(15, 10, 30, 0.7); /* Fundo escuro transparente */
   backdrop-filter: blur(10px);
