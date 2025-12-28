@@ -24,7 +24,7 @@ const formatDate = (dateString?: string | Date) => {
 };
 
 export default function EventHUD({ data }: { data: EnvironmentData }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Lógica simples para ver se o evento está acontecendo agora
   const now = new Date();
