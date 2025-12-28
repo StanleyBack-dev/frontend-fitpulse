@@ -8,6 +8,7 @@ import styles from "./home.module.css";
 import SideMenu from "../../components/SideMenu";
 import EventHUD from "../../components/EventHUD";
 import SponsorTicker from "../../components/SponsorTicker";
+import LiveUsersWidget from "../../components/LiveUsersWidget";
 
 // Mapa (Carregamento Dinâmico)
 const MapPage = dynamic(() => import("../../components/Map/index"), {
@@ -33,17 +34,22 @@ export default function HomePage() {
         <MapPage />
       </div>
 
-      {/* 2. INTERFACE (Com as novas classes Wrapper) */}
+      {/* 2. INTERFACE */}
       <div className={styles.layerInterface}>
         
-        {/* Wrapper do HUD */}
+        {/* Topo Direito */}
         <div className={styles.hudWrapper}>
              <EventHUD data={mockEventData} />
         </div>
         
-        {/* Wrapper do Ticker */}
+        {/* Baixo Centro */}
         <div className={styles.tickerWrapper}>
              <SponsorTicker />
+        </div>
+
+        {/* NOVO: Baixo Esquerda */}
+        <div className={styles.usersWrapper}>
+             <LiveUsersWidget />
         </div>
 
       </div>

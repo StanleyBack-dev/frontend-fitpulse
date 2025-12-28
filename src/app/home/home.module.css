@@ -45,6 +45,14 @@
   z-index: 12;
 }
 
+.usersWrapper {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  pointer-events: auto;
+  z-index: 12;
+}
+
 /* --- CAMADA 3: MENU --- */
 .layerOverlay {
   position: absolute;
@@ -82,5 +90,13 @@
     top: 26px; 
     
     right: 20px;
+  }
+
+  .usersWrapper {
+    bottom: auto;
+    left: 50%; /* Centraliza horizontalmente */
+    transform: translateX(-50%); /* Centraliza exato */
+    
+    top: 26px; /* Mesma linha do Ticker e do Menu */
   }
 }

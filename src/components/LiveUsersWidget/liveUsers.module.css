@@ -1,0 +1,100 @@
+.container {
+  /* O Posicionamento será controlado pelo pai (HomePage), aqui cuidamos do visual */
+  background: rgba(15, 10, 30, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  padding: 6px 14px;
+  
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+.container:hover {
+  background: rgba(15, 10, 30, 0.8);
+  transform: scale(1.02);
+}
+
+/* Indicador Verde Pulsante */
+.indicator {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e; /* Verde Neon */
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.ping {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #22c55e;
+  opacity: 0.7;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Texto */
+.content {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.count {
+  font-weight: 700;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums; /* Evita que o número pule ao mudar */
+}
+
+.label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.icon {
+  color: #a855f7;
+  opacity: 0.6;
+}
+
+/* Ajuste Mobile: Deixa mais compacto */
+@media (max-width: 768px) {
+  .label {
+    display: none; /* Esconde o texto "online" no mobile */
+  }
+  .icon {
+    display: none; /* Esconde o ícone de gráfico */
+  }
+  .container {
+    padding: 4px 10px;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.5); /* Mais escuro para contraste no topo */
+  }
+  .count {
+    font-size: 0.8rem;
+  }
+}
