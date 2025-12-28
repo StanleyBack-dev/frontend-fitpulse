@@ -1,17 +1,19 @@
 "use client";
 
-import { useEnvironmentData } from "@/hooks/useEnvironmentData/useEnvironmentData";
-import LoadingScreen from "@/components/LoadingScreen";
-import MapCanvas from "@/components/MapCanvas";
+import React from "react";
+import dynamic from "next/dynamic";
+import styles from "./home.module.css";
+
+const MapPage = dynamic(() => import("../../components/Map/index"), {
+  ssr: false,
+});
 
 export default function HomePage() {
-  const { eventData, loading } = useEnvironmentData();
-
-  if (loading) return <LoadingScreen message="Carregando evento..." />;
-
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <MapCanvas eventData={eventData} />
-    </div>
+    <main className={styles.container}>
+      <section className={styles.mapSection}>
+        <MapPage />
+      </section>
+    </main>
   );
 }

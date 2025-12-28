@@ -1,0 +1,17 @@
+.terrain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* pequenas "zonas" ou áreas no mapa */
+.zone {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(128, 0, 255, 0.1), transparent 70%);
+  box-shadow: 0 0 20px 5px rgba(128, 0, 255, 0.15);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}

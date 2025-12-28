@@ -1,0 +1,99 @@
+.objectsContainer {
+  position: absolute;
+  /* Deve ter o mesmo tamanho do mapBackground definido no passo anterior */
+  width: 100%; 
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none; /* Permite clicar no mapa atrás se necessário */
+}
+
+.areaWrapper {
+  position: absolute;
+  transform: translate(-50%, -50%); /* Centraliza no ponto X/Y */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto; /* Reativa cliques nos objetos */
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Animação de flutuar suave */
+@keyframes float {
+  0% { transform: translate(-50%, -50%) translateY(0px); }
+  50% { transform: translate(-50%, -50%) translateY(-10px); }
+  100% { transform: translate(-50%, -50%) translateY(0px); }
+}
+
+/* O SVG ocupa todo o wrapper */
+.svgShape {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible; /* Permite que o brilho (glow) saia da caixa */
+  filter: drop-shadow(0 0 5px var(--glow-color));
+  transition: filter 0.3s ease;
+}
+
+.content {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.icon {
+  filter: drop-shadow(0 0 8px var(--glow-color));
+}
+
+.label {
+  color: #fff;
+  font-family: 'Inter', sans-serif; /* Ou sua fonte tech */
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+/* Ponto decorativo embaixo do objeto para marcar o chão */
+.anchorDot {
+  position: absolute;
+  bottom: -20px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 2px currentColor;
+  opacity: 0.6;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.5); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+/* Hover Effects */
+.areaWrapper:hover {
+  transform: translate(-50%, -50%) scale(1.1); /* Zoom leve */
+  z-index: 10;
+}
+
+.areaWrapper:hover .svgShape {
+  filter: drop-shadow(0 0 15px var(--glow-color));
+}
+
+.areaWrapper:hover .label {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: var(--glow-color);
+}
