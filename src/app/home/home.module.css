@@ -20,7 +20,6 @@
   inset: 0;
   z-index: 10;
   pointer-events: none; /* Deixa clicar no mapa */
-  /* Removemos o display: flex daqui para não causar confusão */
 }
 
 /* --- ZONAS DE WIDGETS --- */
@@ -31,7 +30,7 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  pointer-events: auto; /* Reativa clique */
+  pointer-events: auto;
   z-index: 12;
 }
 
@@ -41,7 +40,7 @@
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  pointer-events: auto; /* Reativa clique */
+  pointer-events: auto;
   z-index: 12;
 }
 
@@ -66,37 +65,41 @@
    ========================================= */
 @media (max-width: 768px) {
   
-  /* NO MOBILE: O HUD vai para BAIXO */
-/* NO MOBILE: O HUD vai para BAIXO */
-  .hudWrapper {
-    top: auto;    
-    right: auto;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    display: flex;
-    justify-content: center;
+  /* 1. USERS: Vai para TOPO CENTRO */
+  .usersWrapper {
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px; /* Alinha com o botão do menu */
+    
+    /* Garante que fique acima se algo colidir */
+    z-index: 15; 
   }
 
-  /* NO MOBILE: O Ticker vai para CIMA (Direita) */
+  /* 2. SPONSOR: Vai para TOPO DIREITA */
   .tickerWrapper {
     bottom: auto;
     left: auto;
-    transform: none;
-
-    /* AJUSTE DE ALINHAMENTO AQUI */
-    /* Se o Menu está em top: 20px, o Ticker precisa descer um pouco para centralizar */
-    /* Tente entre 24px e 26px dependendo da altura do seu logo */
-    top: 26px; 
+    transform: none; /* Remove centralização do desktop */
     
+    top: 20px;
     right: 20px;
+    z-index: 15;
   }
 
-  .usersWrapper {
-    bottom: auto;
-    left: 50%; /* Centraliza horizontalmente */
-    transform: translateX(-50%); /* Centraliza exato */
+  /* 3. HUD: Vai para BAIXO (Rodapé) */
+  .hudWrapper {
+    top: auto;
+    right: auto;
     
-    top: 26px; /* Mesma linha do Ticker e do Menu */
+    bottom: 20px;
+    left: 0; 
+    right: 0;
+    
+    /* Flexbox para centralizar o componente do HUD */
+    display: flex;
+    justify-content: center;
+    padding: 0 10px; /* Margem de segurança lateral */
+    z-index: 15;
   }
 }

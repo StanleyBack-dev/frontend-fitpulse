@@ -1,18 +1,21 @@
 .container {
-  /* O Posicionamento será controlado pelo pai (HomePage), aqui cuidamos do visual */
+  /* REMOVIDO: posições externas */
+  
+  /* Mantém Visual */
   background: rgba(15, 10, 30, 0.6);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 30px;
   padding: 6px 14px;
-  
   display: flex;
   align-items: center;
   gap: 10px;
   color: #fff;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   user-select: none;
-  transition: transform 0.2s;
+  
+  width: fit-content;
+  white-space: nowrap;
 }
 
 .container:hover {
@@ -83,18 +86,13 @@
 
 /* Ajuste Mobile: Deixa mais compacto */
 @media (max-width: 768px) {
-  .label {
-    display: none; /* Esconde o texto "online" no mobile */
-  }
-  .icon {
-    display: none; /* Esconde o ícone de gráfico */
-  }
+  .label { display: none; }
+  .icon { display: none; }
+  
   .container {
     padding: 4px 10px;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.5); /* Mais escuro para contraste no topo */
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.5);
   }
-  .count {
-    font-size: 0.8rem;
-  }
+  .count { font-size: 0.8rem; }
 }

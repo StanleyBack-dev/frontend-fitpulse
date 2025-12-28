@@ -42,37 +42,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px; /* Mais espaço entre ícone e texto */
   text-align: center;
 }
 
 .icon {
-  filter: drop-shadow(0 0 8px var(--glow-color));
+  filter: drop-shadow(0 0 12px var(--glow-color)); /* Sombra do ícone maior */
+  transition: transform 0.3s ease;
 }
 
 .label {
   color: #fff;
-  font-family: 'Inter', sans-serif; /* Ou sua fonte tech */
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  
+  /* AUMENTO DA FONTE */
+  font-size: 1.2rem; /* Antes era 0.85rem */
+  font-weight: 700;
+  
   text-transform: uppercase;
-  letter-spacing: 1px;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 8px;
-  border-radius: 4px;
+  letter-spacing: 1.5px;
+  background: rgba(0, 0, 0, 0.7); /* Fundo um pouco mais escuro para contraste */
+  padding: 6px 12px;
+  border-radius: 6px;
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   white-space: nowrap;
 }
 
 /* Ponto decorativo embaixo do objeto para marcar o chão */
 .anchorDot {
   position: absolute;
-  bottom: -20px;
-  width: 6px;
-  height: 6px;
+  bottom: -30px; /* Mais distante pois o objeto é maior */
+  width: 10px;   /* Maior */
+  height: 10px;
   border-radius: 50%;
-  box-shadow: 0 0 10px 2px currentColor;
+  box-shadow: 0 0 15px 4px currentColor;
   opacity: 0.6;
   animation: pulse 2s infinite;
 }
@@ -85,7 +89,7 @@
 
 /* Hover Effects */
 .areaWrapper:hover {
-  transform: translate(-50%, -50%) scale(1.1); /* Zoom leve */
+  transform: translate(-50%, -50%) scale(1.05); /* Zoom leve */
   z-index: 10;
 }
 

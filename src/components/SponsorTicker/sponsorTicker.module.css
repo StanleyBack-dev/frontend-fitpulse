@@ -1,7 +1,7 @@
 .tickerContainer {
-
+  /* REMOVIDO: position, top, right, z-index, transform */
   
-  /* Visual */
+  /* Mantém apenas o Visual */
   background: rgba(15, 10, 30, 0.6);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -10,10 +10,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  z-index: 900; /* Menor que o HUD e Menu, mas acima do mapa */
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  transition: all 0.3s ease; /* Animação suave se mudar de posição */
-  transform: translateZ(0);
+  
+  /* Garante que o container ocupe apenas o espaço necessário */
+  width: fit-content; 
+  white-space: nowrap;
 }
 
 .label {
@@ -52,22 +53,16 @@
 
 /* --- AJUSTE ESTRATÉGICO PARA MOBILE --- */
 @media (max-width: 768px) {
-.tickerContainer {
-    top: 20px;
-    right: 20px;
-    bottom: auto;
-    left: auto;
-    transform: none; /* Remove transform para evitar conflitos de posição */
-  }
+  /* REMOVIDO: Toda a regra de reposicionamento .tickerContainer */
 
-  /* Diminuir um pouco o texto e logo no celular */
+  /* Mantenha apenas os ajustes internos de tamanho */
   .label {
-    font-size: 0.65rem;
-    display: none; /* DICA: Oculte o texto "Patrocínio" no mobile para economizar espaço, mostre só o logo */
+    display: none; /* Esconde texto no mobile */
   }
-
-  /* Se optar por esconder o label acima, ajuste o wrapper */
   .logoWrapper {
-    height: 24px; /* Logo um pouco menor */
+    height: 24px;
+  }
+  .tickerContainer {
+    padding: 6px 12px; /* Padding menor no mobile */
   }
 }

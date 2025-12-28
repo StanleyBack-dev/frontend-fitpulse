@@ -11,16 +11,16 @@ type MapArea = {
   id: string;
   nome: string;
   icon: React.ElementType;
-  top: string;  // % do container do mapa
-  left: string; // % do container do mapa
+  top: string;
+  left: string;
   width: number;
   height: number;
   shape: ShapeType;
   color: string;
 };
 
-// Layout organizado logicamente (considerando mapa 2500x2500)
-// Centralizamos o Hub (50%, 50%) e espalhamos o resto
+// AUMENTEI OS TAMANHOS (Escala ~1.8x maior que o anterior)
+// Como o mapa tem 2500px, temos bastante espaço.
 const areas: MapArea[] = [
   {
     id: "hub-central",
@@ -28,105 +28,105 @@ const areas: MapArea[] = [
     icon: Zap,
     top: "50%",
     left: "50%",
-    width: 200,
-    height: 200,
+    width: 360,   // Antes era 200
+    height: 360,  // Antes era 200
     shape: "hexagon",
-    color: "#a855f7", // Roxo
+    color: "#a855f7",
   },
   {
     id: "entrada",
     nome: "Entrada",
     icon: DoorOpen,
-    top: "85%", // Bem embaixo
+    top: "88%",   // Ajustei um pouco pra baixo pois o objeto cresceu
     left: "50%",
-    width: 160,
-    height: 100,
+    width: 280,   // Antes 160
+    height: 140,  // Antes 100
     shape: "rectangle",
-    color: "#60a5fa", // Azul claro
+    color: "#60a5fa",
   },
   {
     id: "palestras",
     nome: "Main Stage",
     icon: Mic2,
-    top: "25%", // Topo
+    top: "20%",   // Ajustei pra cima
     left: "50%",
-    width: 180,
-    height: 180,
+    width: 320,   // Antes 180
+    height: 320,
     shape: "circle",
-    color: "#ff0077", // Rosa choque
+    color: "#ff0077",
   },
   {
     id: "networking",
     nome: "Networking",
     icon: Users,
     top: "50%",
-    left: "80%", // Extrema direita
-    width: 160,
-    height: 120,
+    left: "82%",
+    width: 280,
+    height: 200,
     shape: "rectangle",
-    color: "#00c3ff", // Cyan
+    color: "#00c3ff",
   },
   {
     id: "mentoria",
     nome: "Mentoria",
     icon: Lightbulb,
     top: "50%",
-    left: "20%", // Extrema esquerda
-    width: 150,
-    height: 150,
+    left: "18%",
+    width: 260,
+    height: 260,
     shape: "hexagon",
-    color: "#facc15", // Amarelo
+    color: "#facc15",
   },
   {
     id: "descanso",
     nome: "Lounge",
     icon: Coffee,
-    top: "70%",
-    left: "25%",
-    width: 140,
-    height: 140,
+    top: "75%",
+    left: "20%",
+    width: 240,
+    height: 240,
     shape: "circle",
-    color: "#f97316", // Laranja
+    color: "#f97316",
   },
   {
     id: "exposicao",
     nome: "Expo Hall",
     icon: LayoutDashboard,
-    top: "70%",
-    left: "75%",
-    width: 160,
-    height: 120,
+    top: "75%",
+    left: "80%",
+    width: 280,
+    height: 180,
     shape: "rectangle",
-    color: "#22c55e", // Verde
+    color: "#22c55e",
   },
   {
     id: "vip",
     nome: "VIP Area",
     icon: Star,
-    top: "20%",
-    left: "80%", // Canto superior direito (exclusivo)
-    width: 120,
-    height: 120,
+    top: "15%",
+    left: "85%",
+    width: 200,
+    height: 200,
     shape: "square",
-    color: "#ec4899", // Pink
+    color: "#ec4899",
   },
 ];
 
 export default function ObjectsLayer() {
   
-  // Renderizador de formas SVG
+  // Aumentei o strokeWidth para acompanhar o tamanho
   const renderShape = (type: ShapeType, w: number, h: number, color: string) => {
-    const strokeW = 3;
-    const style = { stroke: color, strokeWidth: strokeW, fill: `${color}15` }; // 15 = transparência baixa
+    const strokeW = 5; // Borda mais grossa
+    const style = { stroke: color, strokeWidth: strokeW, fill: `${color}15` };
     
     switch (type) {
       case "circle":
         return <circle cx="50%" cy="50%" r={(w/2) - strokeW} {...style} />;
       case "square":
       case "rectangle":
-        return <rect x={strokeW} y={strokeW} width={w - strokeW*2} height={h - strokeW*2} rx="12" {...style} />;
+        // Aumentei o rx (border-radius) para 20
+        return <rect x={strokeW} y={strokeW} width={w - strokeW*2} height={h - strokeW*2} rx="20" {...style} />;
       case "hexagon":
-        // Cálculo simples de hexágono SVG
         const p = strokeW; 
         const points = `
           ${w/2},${p} 
@@ -153,13 +153,12 @@ export default function ObjectsLayer() {
             left: area.left,
             width: area.width,
             height: area.height,
-            "--glow-color": area.color, // Variável CSS para usar no styles
+            "--glow-color": area.color,
           } as React.CSSProperties}
         >
-          {/* SVG de Fundo (A forma) */}
           <svg className={styles.svgShape} width="100%" height="100%">
             <filter id={`glow-${area.id}`}>
-              <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+              <feGaussianBlur stdDeviation="4" result="coloredBlur" /> {/* Blur maior */}
               <feMerge>
                 <feMergeNode in="coloredBlur" />
                 <feMergeNode in="SourceGraphic" />
@@ -168,15 +167,15 @@ export default function ObjectsLayer() {
             {renderShape(area.shape, area.width, area.height, area.color)}
           </svg>
 
-          {/* Conteúdo (Ícone e Texto) */}
           <div className={styles.content}>
-            <area.icon size={28} className={styles.icon} color={area.color} />
-            <span className={styles.label} style={{ textShadow: `0 0 10px ${area.color}` }}>
+            {/* Ícone agora tem tamanho fixo maior (48px) para não sumir no objeto grande */}
+            <area.icon size={48} className={styles.icon} color={area.color} />
+            
+            <span className={styles.label} style={{ textShadow: `0 0 15px ${area.color}` }}>
               {area.nome}
             </span>
           </div>
 
-          {/* Efeito de "Ponto de ancoragem" embaixo do objeto */}
           <div className={styles.anchorDot} style={{ backgroundColor: area.color }}></div>
         </div>
       ))}
