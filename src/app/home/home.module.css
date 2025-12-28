@@ -59,26 +59,28 @@
 @media (max-width: 768px) {
   
   /* NO MOBILE: O HUD vai para BAIXO */
+/* NO MOBILE: O HUD vai para BAIXO */
   .hudWrapper {
-    top: auto;     /* Anula o topo */
-    right: auto;   /* Anula a direita */
-    
-    /* Nova Posição */
+    top: auto;    
+    right: auto;
     bottom: 20px;
     left: 20px;
-    right: 20px;   /* Ocupa a largura disponível se precisar */
+    right: 20px;
     display: flex;
-    justify-content: center; /* Centraliza o HUD na tela */
+    justify-content: center;
   }
 
   /* NO MOBILE: O Ticker vai para CIMA (Direita) */
   .tickerWrapper {
-    bottom: auto;  /* Anula o baixo */
-    left: auto;    /* Anula o centro */
-    transform: none; /* Remove a centralização */
+    bottom: auto;
+    left: auto;
+    transform: none;
 
-    /* Nova Posição */
-    top: 20px;
+    /* AJUSTE DE ALINHAMENTO AQUI */
+    /* Se o Menu está em top: 20px, o Ticker precisa descer um pouco para centralizar */
+    /* Tente entre 24px e 26px dependendo da altura do seu logo */
+    top: 26px; 
+    
     right: 20px;
   }
 }
