@@ -1,60 +1,108 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation"; // Hook do Next para ler URL
 import dynamic from "next/dynamic";
 import styles from "./home.module.css";
+import { validateQrToken } from "../../services/eventService";
 
 // Componentes de UI
 import SideMenu from "../../components/SideMenu";
 import EventHUD from "../../components/EventHUD";
 import SponsorTicker from "../../components/SponsorTicker";
 import LiveUsersWidget from "../../components/LiveUsersWidget";
+import NoEventScreen from "../../components/NoEventScreen"; // Importe a tela de erro
+import LoadingScreen from "../../components/LoadingScreen"; // Seu loading existente
 
-// Mapa (Carregamento Dinâmico)
+// Mapa
 const MapPage = dynamic(() => import("../../components/Map/index"), {
   ssr: false,
-  loading: () => <div className={styles.loading}>Carregando sistema...</div>
+  loading: () => null // Deixa o loading screen principal cuidar disso
 });
 
-// Mock Data
-const mockEventData = {
-  name: "Tech Summit 2025",
-  type: "Conferência",
-  locationName: "Goiânia Arena",
-  startDate: "2025-10-15T09:00:00",
-  description: "Evento principal de tecnologia."
-};
-
 export default function HomePage() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token"); // Pega ?token=XYZ da URL
+
+  // Estados da Máquina
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [eventData, setEventData] = useState<any>(null);
+
+  useEffect(() => {
+    // Se não tiver token na URL, já barra
+    if (!token) {
+      setErrorMsg("Nenhum código de evento fornecido. Escaneie um QR Code válido.");
+      setLoading(false);
+      return;
+    }
+
+    const fetchEvent = async () => {
+      try {
+        const data = await validateQrToken(token);
+        
+        // Formata os dados vindos do backend para o formato que o HUD espera
+        // O backend retorna: environmentId, environmentName, mapConfig
+        // Precisamos adaptar para: startDate, locationName, etc (se o backend mandar isso futuramente)
+        
+        const formattedData = {
+          name: data.environmentName,
+          type: "Evento Ao Vivo", // Exemplo, ideal vir do backend
+          locationName: "Localização do Evento", // Ideal vir do backend
+          description: "Bem-vindo ao mapa interativo.",
+          // mapConfig: data.mapConfig // Se você usar config dinâmica de mapa
+        };
+
+        setEventData(formattedData);
+      } catch (err: any) {
+        // Pega a mensagem de erro do backend (ex: "QR code expirado")
+        setErrorMsg(err.message || "Evento inválido ou indisponível.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [token]);
+
+  // 1. ESTADO DE LOADING
+  if (loading) {
+    return <LoadingScreen message="Acessando o Mainframe..." />;
+  }
+
+  // 2. ESTADO DE ERRO (SEM EVENTO)
+  if (errorMsg || !eventData) {
+    return <NoEventScreen message={errorMsg || "Acesso não autorizado."} />;
+  }
+
+  // 3. ESTADO DE SUCESSO (MOSTRA O MAPA)
   return (
     <main className={styles.screenContainer}>
       
-      {/* 1. MAPA */}
+      {/* MAPA */}
       <div className={styles.layerMap}>
         <MapPage />
       </div>
 
-      {/* 2. INTERFACE */}
+      {/* INTERFACE */}
       <div className={styles.layerInterface}>
         
-        {/* Topo Direito */}
+        {/* HUD com dados REAIS do evento */}
         <div className={styles.hudWrapper}>
-             <EventHUD data={mockEventData} />
+             <EventHUD data={eventData} />
         </div>
         
-        {/* Baixo Centro */}
         <div className={styles.tickerWrapper}>
              <SponsorTicker />
         </div>
 
-        {/* NOVO: Baixo Esquerda */}
         <div className={styles.usersWrapper}>
              <LiveUsersWidget />
         </div>
 
       </div>
 
-      {/* 3. MENU */}
+      {/* MENU */}
       <div className={styles.layerOverlay}>
         <SideMenu />
       </div>

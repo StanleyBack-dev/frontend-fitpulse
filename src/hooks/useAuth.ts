@@ -15,6 +15,7 @@ export const useAuthRedirect = () => {
         } else {
           setIsLoading(false);
         }
+        
       } catch (err) {
         setIsLoading(false);
       }
