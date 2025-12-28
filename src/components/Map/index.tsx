@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./map.module.css";
 import ObjectsLayer from "../../components/ObjectsLayer";
 import InteractionLayer from "../../components/InteractionsLayer";
+import AdsLayer from "../AdsLayer";
 import { useMapNavigation } from "../../hooks/useMapNavigation";
 
 export default function MapPage() {
@@ -19,6 +20,7 @@ export default function MapPage() {
           <div className={styles.gridOverlay}></div>
 
           <div className={styles.layers}>
+            <AdsLayer />
             <ObjectsLayer />
             <InteractionLayer />
           </div>

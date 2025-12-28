@@ -1,0 +1,84 @@
+.tickerContainer {
+  position: fixed;
+  /* Posição Padrão (Desktop): Embaixo e Centralizado */
+  bottom: 30px; /* Subi um pouco para dar ar */
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* Visual */
+  background: rgba(15, 10, 30, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 35; /* Menor que o HUD e Menu, mas acima do mapa */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: all 0.3s ease; /* Animação suave se mudar de posição */
+}
+
+.label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 1px;
+}
+
+.logoWrapper {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.logo {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    animation: fadeSlide 0.5s ease-out;
+    filter: grayscale(100%) brightness(2); /* Deixa o logo branco/cinza pra combinar */
+    opacity: 0.8;
+    transition: all 0.3s;
+}
+
+.tickerContainer:hover .logo {
+    filter: grayscale(0%); /* Mostra cores originais no hover */
+    opacity: 1;
+}
+
+@keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 0.8; transform: translateY(0); }
+}
+
+/* --- AJUSTE ESTRATÉGICO PARA MOBILE --- */
+@media (max-width: 768px) {
+  .tickerContainer {
+    /* Reseta as propriedades de posicionamento do Desktop */
+    bottom: auto;
+    left: auto;
+    transform: none;
+
+    /* Nova Posição: Topo Direito */
+    top: 20px;
+    right: 20px; 
+
+    /* Ajustes Visuais para Mobile (Ocupar menos espaço) */
+    padding: 6px 16px;
+    border-radius: 12px; /* Menos arredondado para encaixar no canto */
+    background: rgba(15, 10, 30, 0.8); /* Um pouco mais escuro para leitura */
+  }
+
+  /* Diminuir um pouco o texto e logo no celular */
+  .label {
+    font-size: 0.65rem;
+    display: none; /* DICA: Oculte o texto "Patrocínio" no mobile para economizar espaço, mostre só o logo */
+  }
+
+  /* Se optar por esconder o label acima, ajuste o wrapper */
+  .logoWrapper {
+    height: 24px; /* Logo um pouco menor */
+  }
+}

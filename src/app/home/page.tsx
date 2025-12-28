@@ -4,7 +4,8 @@ import React from "react";
 import dynamic from "next/dynamic";
 import styles from "./home.module.css";
 import SideMenu from "../../components/SideMenu";
-import EventHUD from "../../components/EventHUD"; // Importe aqui
+import EventHUD from "../../components/EventHUD";
+import SponsorTicker from "../../components/SponsorTicker/index";
 
 const MapPage = dynamic(() => import("../../components/Map/index"), {
   ssr: false,
@@ -29,6 +30,8 @@ export default function HomePage() {
 
       {/* 2. Informações do Evento na Direita (Sobre o mapa) */}
       <EventHUD data={mockEventData} />
+
+      <SponsorTicker />
 
       {/* 3. O Mapa */}
       <section className={styles.mapSection}>
