@@ -1,108 +1,128 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation"; // Hook do Next para ler URL
+import { useSearchParams } from "next/navigation"; // Para ler ?token=XYZ
 import dynamic from "next/dynamic";
 import styles from "./home.module.css";
-import { validateQrToken } from "../../services/eventService";
 
-// Componentes de UI
+// --- SERVICES ---
+import { validateQrToken } from "../../services/eventService";
+import { getEnvironmentById } from "../../services/getEnvironmentService";
+
+// --- COMPONENTES ---
 import SideMenu from "../../components/SideMenu";
-import EventHUD from "../../components/EventHUD";
+import EventHUD, { EnvironmentData } from "../../components/EventHUD"; // Importe a tipagem do HUD
 import SponsorTicker from "../../components/SponsorTicker";
 import LiveUsersWidget from "../../components/LiveUsersWidget";
-import NoEventScreen from "../../components/NoEventScreen"; // Importe a tela de erro
-import LoadingScreen from "../../components/LoadingScreen"; // Seu loading existente
+import NoEventScreen from "../../components/NoEventScreen";
+import LoadingScreen from "../../components/LoadingScreen";
 
-// Mapa
+// --- MAPA (Carregamento Dinâmico) ---
+// ssr: false é vital para mapas que usam window/canvas
 const MapPage = dynamic(() => import("../../components/Map/index"), {
   ssr: false,
-  loading: () => null // Deixa o loading screen principal cuidar disso
+  loading: () => null // Deixa o LoadingScreen principal controlar a UX
 });
 
 export default function HomePage() {
+  // 1. Captura o token da URL
   const searchParams = useSearchParams();
-  const token = searchParams.get("token"); // Pega ?token=XYZ da URL
+  const token = searchParams.get("token");
 
-  // Estados da Máquina
-  const [loading, setLoading] = useState(true);
+  // 2. Estados da Aplicação
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState("Iniciando sistema...");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [eventData, setEventData] = useState<any>(null);
+  
+  // O dado que vai alimentar o HUD e futuramente configurar o mapa
+  const [eventData, setEventData] = useState<EnvironmentData | null>(null);
 
+  // 3. O "Cérebro" da Página
   useEffect(() => {
-    // Se não tiver token na URL, já barra
+    // Se entrar sem token, rejeita imediatamente
     if (!token) {
-      setErrorMsg("Nenhum código de evento fornecido. Escaneie um QR Code válido.");
-      setLoading(false);
+      setErrorMsg("Nenhum código de acesso detectado.");
+      setIsLoading(false);
       return;
     }
 
-    const fetchEvent = async () => {
+const initPage = async () => {
       try {
-        const data = await validateQrToken(token);
+        setLoadingMessage("Validando e carregando evento...");
         
-        // Formata os dados vindos do backend para o formato que o HUD espera
-        // O backend retorna: environmentId, environmentName, mapConfig
-        // Precisamos adaptar para: startDate, locationName, etc (se o backend mandar isso futuramente)
+        // Agora esta função já traz TUDO
+        const fullData = await validateQrToken(token);
         
-        const formattedData = {
-          name: data.environmentName,
-          type: "Evento Ao Vivo", // Exemplo, ideal vir do backend
-          locationName: "Localização do Evento", // Ideal vir do backend
-          description: "Bem-vindo ao mapa interativo.",
-          // mapConfig: data.mapConfig // Se você usar config dinâmica de mapa
+        // Precisamos apenas adaptar o nome das propriedades se forem diferentes
+        // No DTO retornamos "environmentName", mas o HUD espera "name"
+        const adaptedData: EnvironmentData = {
+            idEnvironments: fullData.environmentId,
+            name: fullData.environmentName, // Adapter simples
+            description: fullData.description,
+            type: fullData.type,
+            locationName: fullData.locationName,
+            startDate: fullData.startDate,
+            endDate: fullData.endDate,
+            status: fullData.status
         };
 
-        setEventData(formattedData);
+        setEventData(adaptedData);
+
       } catch (err: any) {
-        // Pega a mensagem de erro do backend (ex: "QR code expirado")
-        setErrorMsg(err.message || "Evento inválido ou indisponível.");
+        console.error("Erro na inicialização:", err);
+        // Pega a mensagem amigável do backend ou usa uma genérica
+        setErrorMsg(err.message || "Falha ao carregar o evento. Tente novamente.");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    fetchEvent();
+    initPage();
   }, [token]);
 
-  // 1. ESTADO DE LOADING
-  if (loading) {
-    return <LoadingScreen message="Acessando o Mainframe..." />;
+  // --- RENDERIZAÇÃO CONDICIONAL ---
+
+  // CASO 1: Carregando
+  if (isLoading) {
+    return <LoadingScreen message={loadingMessage} />;
   }
 
-  // 2. ESTADO DE ERRO (SEM EVENTO)
+  // CASO 2: Erro (Token inválido, expirado ou erro de rede)
   if (errorMsg || !eventData) {
     return <NoEventScreen message={errorMsg || "Acesso não autorizado."} />;
   }
 
-  // 3. ESTADO DE SUCESSO (MOSTRA O MAPA)
+  // CASO 3: Sucesso (Mostra o App Completo)
   return (
     <main className={styles.screenContainer}>
       
-      {/* MAPA */}
+      {/* CAMADA 1: O Mundo 3D/2D */}
       <div className={styles.layerMap}>
         <MapPage />
       </div>
 
-      {/* INTERFACE */}
+      {/* CAMADA 2: Interface de Usuário (HUDs) */}
       <div className={styles.layerInterface}>
         
-        {/* HUD com dados REAIS do evento */}
+        {/* Topo Direito: Detalhes do Evento */}
         <div className={styles.hudWrapper}>
+             {/* Passamos o eventData preenchido para o HUD "Burro" exibir */}
              <EventHUD data={eventData} />
         </div>
         
+        {/* Baixo Centro: Patrocinadores */}
         <div className={styles.tickerWrapper}>
              <SponsorTicker />
         </div>
 
+        {/* Baixo Esquerda (ou Topo Centro no Mobile): Usuários Online */}
         <div className={styles.usersWrapper}>
              <LiveUsersWidget />
         </div>
 
       </div>
 
-      {/* MENU */}
+      {/* CAMADA 3: Menu Lateral e Modais */}
       <div className={styles.layerOverlay}>
         <SideMenu />
       </div>

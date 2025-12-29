@@ -2,62 +2,83 @@
 
 import React, { useState } from "react";
 import styles from "./eventHud.module.css";
-import { MapPin, Calendar, Info, ChevronUp, ChevronDown } from "lucide-react";
+import { MapPin, Calendar, Info, ChevronUp, ChevronDown, Activity } from "lucide-react";
 
-// Simulando a tipagem baseada no seu DTO
-interface EnvironmentData {
+// Definição da tipagem exata que vem do seu Service/GraphQL
+export interface EnvironmentData {
+  idEnvironments: string;
   name: string;
+  description?: string;
   type?: string;
   locationName?: string;
-  startDate?: string | Date;
-  endDate?: string | Date;
-  description?: string;
+  startDate?: string; // GraphQL geralmente manda datas como string ISO
+  endDate?: string;
+  status?: string;
 }
 
-// Helper para formatar datas bonitas (Ex: 12 OUT - 14:00)
-const formatDate = (dateString?: string | Date) => {
-  if (!dateString) return "--/--";
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('pt-BR', { 
-    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' 
-  }).format(date);
+// Helper de formatação de data
+const formatDate = (dateString?: string) => {
+  if (!dateString) return null;
+  try {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('pt-BR', { 
+      day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' 
+    }).format(date);
+  } catch {
+    return dateString;
+  }
 };
 
-export default function EventHUD({ data }: { data: EnvironmentData }) {
+export default function EventHUD({ data }: { data: EnvironmentData | null }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
-  // Lógica simples para ver se o evento está acontecendo agora
-  const now = new Date();
-  const start = data.startDate ? new Date(data.startDate) : null;
-  const end = data.endDate ? new Date(data.endDate) : null;
-  const isLive = start && end && now >= start && now <= end;
+  // Se os dados ainda não chegaram (por algum motivo), não quebra a tela
+  if (!data) return null;
+
+  // Lógica de Status (Ao Vivo vs Encerrado)
+  const getStatus = () => {
+    const now = new Date();
+    const start = data.startDate ? new Date(data.startDate) : null;
+    const end = data.endDate ? new Date(data.endDate) : null;
+
+    if (data.status !== 'ACTIVE') return { text: "CANCELADO", color: styles.statusInactive };
+    if (start && end && now >= start && now <= end) return { text: "AO VIVO", color: styles.statusLive, pulse: true };
+    if (start && now < start) return { text: "EM BREVE", color: styles.statusFuture };
+    if (end && now > end) return { text: "ENCERRADO", color: styles.statusEnded };
+    
+    return { text: data.type || "EVENTO", color: styles.statusDefault };
+  };
+
+  const status = getStatus();
 
   return (
     <div className={`${styles.hudContainer} ${isCollapsed ? styles.collapsed : ''}`}>
       
-      {/* Cabeçalho (Sempre visível) */}
+      {/* --- CABEÇALHO (Sempre visível) --- */}
       <div className={styles.header}>
-        <div className={styles.statusRow}>
-          {isLive ? (
-             <span className={styles.liveBadge}><span className={styles.dot}></span> AO VIVO</span>
-          ) : (
-             <span className={styles.typeBadge}>{data.type || "EVENTO"}</span>
-          )}
+        <div className={styles.topRow}>
+          {/* Badge de Status */}
+          <span className={`${styles.badge} ${status.color}`}>
+            {status.pulse && <span className={styles.dot}></span>}
+            {status.text}
+          </span>
           
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)} 
             className={styles.toggleBtn}
+            aria-label="Expandir detalhes"
           >
-            {isCollapsed ? <ChevronDown size={16}/> : <ChevronUp size={16}/>}
+            {isCollapsed ? <ChevronDown size={18}/> : <ChevronUp size={18}/>}
           </button>
         </div>
         
         <h1 className={styles.eventName}>{data.name}</h1>
       </div>
 
-      {/* Conteúdo (Ocultável) */}
+      {/* --- CONTEÚDO (Expansível) --- */}
       <div className={styles.content}>
         
+        {/* Localização */}
         {data.locationName && (
           <div className={styles.infoRow}>
             <MapPin size={16} className={styles.icon} />
@@ -65,19 +86,23 @@ export default function EventHUD({ data }: { data: EnvironmentData }) {
           </div>
         )}
 
+        {/* Datas */}
         {(data.startDate || data.endDate) && (
           <div className={styles.infoRow}>
             <Calendar size={16} className={styles.icon} />
             <div className={styles.dates}>
-              <span>Início: {formatDate(data.startDate)}</span>
+              {data.startDate && <span>Início: {formatDate(data.startDate)}</span>}
               {data.endDate && <span>Fim: {formatDate(data.endDate)}</span>}
             </div>
           </div>
         )}
 
+        {/* Descrição */}
         {data.description && (
-          <div className={styles.description}>
-            <Info size={14} className={styles.icon} style={{ marginTop: 2 }} />
+          <div className={styles.descriptionBox}>
+            <div className={styles.descLabel}>
+               <Info size={12} style={{ marginRight: 4 }}/> Sobre
+            </div>
             <p>{data.description}</p>
           </div>
         )}
