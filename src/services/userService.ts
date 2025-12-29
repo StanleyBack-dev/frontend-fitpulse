@@ -9,7 +9,7 @@ export interface UserProfile {
   userRole?: string;
 }
 
-export async function getMyProfile(): Promise<UserProfile | null> {
+export async function getMyUser(): Promise<UserProfile | null> {
   const query = `
     query {
       me {

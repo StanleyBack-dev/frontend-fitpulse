@@ -10,7 +10,7 @@ import {
 
 // Services
 import { logoutSession } from "../../services/authService"; 
-import { getMyProfile, UserProfile } from "../../services/userService";
+import { getMyUser, UserProfile } from "../../services/userService";
 
 export default function SideMenu() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function SideMenu() {
     let isMounted = true;
 
     const fetchUser = async () => {
-      const profile = await getMyProfile();
+      const profile = await getMyUser();
       if (isMounted && profile) {
         setUserData(profile);
       }
