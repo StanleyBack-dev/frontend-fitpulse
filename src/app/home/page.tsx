@@ -18,7 +18,7 @@ import LiveUsersWidget from "../../components/LiveUsersWidget";
 import LoadingScreen from "../../components/LoadingScreen";
 import QrScannerModal from "../../components/QrScannerModal";
 import NoEventScreen from "../../components/NoEventScreen";
-import LoginButton from "../../components/LoginButton"; // <--- 1. Importe o botão
+import LoginButton from "../../components/LoginButton";
 
 // --- MAPA ---
 const MapPage = dynamic(() => import("../../components/Map/index"), {
@@ -47,10 +47,12 @@ function HomeContent() {
       try {
         setLoadingMessage("Verificando acesso...");
 
+        // 1. Verifica Sessão
         const session = await checkSession();
         const isAuth = session.authenticated;
         setIsAuthenticated(isAuth);
 
+        // 2. Verifica QR Code de Evento
         if (token) {
           try {
             const fullData = await validateQrToken(token);
@@ -109,7 +111,7 @@ function HomeContent() {
             <MapPage />
           </div>
 
-          {/* NOVIDADE: Botão de Login Flutuante para Visitantes */}
+          {/* Botão de Login Flutuante para Visitantes (Se não estiver autenticado) */}
           {!isAuthenticated && (
             <div className={styles.visitorLoginOverlay}>
                <LoginButton />
@@ -129,7 +131,7 @@ function HomeContent() {
           </div>
         </>
       ) : (
-        // SE NÃO TEM EVENTO (Mas está autenticado)
+        // SE NÃO TEM EVENTO (Mas está autenticado) -> Boas Vindas
         <div className={styles.emptyStateContainer}>
           <div className={styles.emptyContent}>
             <div className={styles.pulseIconWrapper}>
@@ -152,6 +154,7 @@ function HomeContent() {
       {/* --- CAMADA DO MENU LATERAL (Apenas Autenticados) --- */}
       {isAuthenticated && (
         <div className={styles.layerOverlay}>
+          {/* O SideMenu buscará seus próprios dados usando o service com deduplicação */}
           <SideMenu />
         </div>
       )}

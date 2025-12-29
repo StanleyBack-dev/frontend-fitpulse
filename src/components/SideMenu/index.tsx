@@ -1,35 +1,64 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./sidemenu.module.css";
 import { 
   Menu, X, User, Calendar, Settings, 
-  LogOut, Map, Bell 
+  LogOut, Bell 
 } from "lucide-react";
+
+// Services
 import { logoutSession } from "../../services/authService"; 
+import { getMyProfile, UserProfile } from "../../services/userService";
 
 export default function SideMenu() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // Estado para os dados do usuário
+  const [userData, setUserData] = useState<UserProfile | null>(null);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // --- LÓGICA DE LOGOUT ---
+  // --- BUSCAR DADOS DO USUÁRIO ---
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchUser = async () => {
+      const profile = await getMyProfile();
+      if (isMounted && profile) {
+        setUserData(profile);
+      }
+    };
+
+    // Só busca se o menu estiver aberto (performance) OU busca logo ao montar (preferência)
+    // Aqui vou buscar ao montar para garantir que os dados estejam lá
+    fetchUser();
+
+    return () => { isMounted = false; };
+  }, []);
+
+  // --- LÓGICA DE AVATAR (Iniciais) ---
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
-
-    // 1. Chama o backend para limpar o cookie HTTP-Only
     await logoutSession();
-
-    // 3. Redireciona
     setIsLoggingOut(false);
     window.location.href = '/';
   };
 
   const menuItems = [
-    { icon: User, label: "Meu Perfil", action: () => console.log("Perfil") },
+    { icon: User, label: "Meu Perfil", action: () => router.push('/profile') },
     { icon: Calendar, label: "Meus Eventos", action: () => console.log("Eventos") },
     { icon: Bell, label: "Notificações", action: () => console.log("Notificações") },
     { icon: Settings, label: "Configurações", action: () => console.log("Config") },
@@ -53,11 +82,26 @@ export default function SideMenu() {
           
           <div className={styles.header}>
             <div className={styles.userInfo}>
-              <div className={styles.avatar}>SR</div>
-              <div>
-                <div className={styles.userName}>Stanley Rodrigues</div>
-                <div className={styles.userRole}>Desenvolvedor</div>
+              
+              {/* LÓGICA DE EXIBIÇÃO DO AVATAR */}
+              <div className={styles.avatar}>
+                {userData?.urlAvatar ? (
+                  <img src={userData.urlAvatar} alt="Avatar" className={styles.avatarImg} />
+                ) : (
+                  <span>{userData ? getInitials(userData.name) : "..."}</span>
+                )}
               </div>
+              
+              <div>
+                {/* DADOS DINÂMICOS */}
+                <div className={styles.userName}>
+                    {userData ? userData.name : "Carregando..."}
+                </div>
+                <div className={styles.userRole}>
+                    {userData?.email || "Usuário"}
+                </div>
+              </div>
+
             </div>
           </div>
 

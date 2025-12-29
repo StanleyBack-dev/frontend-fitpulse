@@ -82,16 +82,27 @@
   gap: 12px;
 }
 
+/* Adicione isso ao seu arquivo CSS existente */
+
 .avatar {
+  /* Mantenha suas propriedades de tamanho (ex: width: 50px; height: 50px;) */
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
+  background: #333; /* Cor de fundo para as iniciais */
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   color: #fff;
+  overflow: hidden; /* Importante para cortar a imagem redonda */
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .userName {
