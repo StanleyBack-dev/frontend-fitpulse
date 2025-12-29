@@ -103,3 +103,187 @@
     z-index: 15;
   }
 }
+
+/* --- EMPTY STATE (Modo sem evento) --- */
+.emptyStateContainer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Fundo elegante substituindo o mapa */
+  background: radial-gradient(circle at center, #1a0b2e 0%, #000 70%);
+  z-index: 1; /* Fica abaixo do Menu (Overlay), mas visível */
+}
+
+.emptyContent {
+  text-align: center;
+  max-width: 400px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.pulseIconWrapper {
+  width: 100px;
+  height: 100px;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
+}
+
+.pulseIcon {
+  color: #a855f7;
+  fill: rgba(168, 85, 247, 0.5);
+}
+
+.emptyContent h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+}
+
+.emptyContent p {
+  color: #94a3b8;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.scanButton {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.scanButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ... seus outros estilos ... */
+
+/* Container do botão flutuante */
+.visitorLoginOverlay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 50;
+  
+  /* Fundo sutil para destacar do mapa */
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 30px; /* Mais arredondado */
+  padding: 4px;        /* Padding pequeno no container */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  animation: fadeIn 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+/* --- ESTILOS DE SOBRESCRITA (Para Desktop) --- */
+/* Isso força o botão a se comportar dentro do container */
+.visitorLoginOverlay button {
+  background: transparent !important; /* Remove fundo original se necessário */
+  color: #333 !important; /* Garante contraste */
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  
+  /* Tamanho ajustado para Desktop */
+  font-size: 0.9rem !important;
+  padding: 8px 16px !important;
+  height: auto !important;
+  min-height: unset !important;
+  width: auto !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Garante que o ícone do Google fique alinhado */
+.visitorLoginOverlay button svg {
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: 0 !important; /* Remove margem inline se houver */
+}
+
+/* ... estilos desktop anteriores ... */
+
+/* --- RESPONSIVIDADE (MOBILE) --- */
+@media (max-width: 768px) {
+  
+  .visitorLoginOverlay {
+    top: 10px;
+    left: 10px;
+    padding: 3px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95); /* Fundo um pouco mais sólido */
+  }
+
+  /* TRUQUE PARA TROCAR O TEXTO E DIMINUIR */
+  .visitorLoginOverlay button {
+    /* 1. Esconde o texto "Entrar com Google" zerando a fonte */
+    font-size: 0 !important; 
+    
+    /* 2. Ajustes de tamanho e espaçamento */
+    padding: 4px 10px !important;
+    gap: 6px !important;
+    min-height: 28px !important; /* Altura forçada pequena */
+  }
+
+  /* Mantém o ícone visível e pequeno */
+  .visitorLoginOverlay button svg {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 !important;
+  }
+
+  /* 3. Insere o novo texto "Entrar" */
+  .visitorLoginOverlay button::after {
+    content: "Entrar";
+    font-size: 0.75rem !important; /* Tamanho do novo texto (12px) */
+    font-weight: 700 !important;
+    color: #333 !important;
+    margin-top: 1px; /* Ajuste fino de alinhamento vertical */
+  }
+}
+
+/* --- EXTREMAMENTE PEQUENO (Opcional, para telas < 320px) --- */
+@media (max-width: 340px) {
+  .visitorLoginOverlay button::after {
+    display: none; /* Remove até o texto, deixa só o ícone G */
+  }
+  .visitorLoginOverlay button {
+     padding: 4px !important;
+  }
+}

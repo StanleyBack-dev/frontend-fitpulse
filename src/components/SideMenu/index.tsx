@@ -1,18 +1,33 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./sidemenu.module.css";
 import { 
   Menu, X, User, Calendar, Settings, 
   LogOut, Map, Bell 
 } from "lucide-react";
+import { logoutSession } from "../../services/authService"; 
 
 export default function SideMenu() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Exemplo de itens do menu
+  // --- LÓGICA DE LOGOUT ---
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    // 1. Chama o backend para limpar o cookie HTTP-Only
+    await logoutSession();
+
+    // 3. Redireciona
+    setIsLoggingOut(false);
+    window.location.href = '/';
+  };
+
   const menuItems = [
     { icon: User, label: "Meu Perfil", action: () => console.log("Perfil") },
     { icon: Calendar, label: "Meus Eventos", action: () => console.log("Eventos") },
@@ -22,7 +37,6 @@ export default function SideMenu() {
 
   return (
     <>
-      {/* Botão de Toggle (Sempre visível) */}
       <button 
         className={styles.toggleBtn} 
         onClick={toggleMenu}
@@ -31,19 +45,15 @@ export default function SideMenu() {
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Container Overlay */}
       <div className={`${styles.overlay} ${isOpen ? styles.open : ""}`}>
         
-        {/* Fundo escuro (clicar fecha o menu) */}
         <div className={styles.backdrop} onClick={toggleMenu} />
 
-        {/* O Menu Lateral */}
         <nav className={styles.panel}>
           
-          {/* Cabeçalho do Usuário */}
           <div className={styles.header}>
             <div className={styles.userInfo}>
-              <div className={styles.avatar}>SR</div> {/* Iniciais */}
+              <div className={styles.avatar}>SR</div>
               <div>
                 <div className={styles.userName}>Stanley Rodrigues</div>
                 <div className={styles.userRole}>Desenvolvedor</div>
@@ -51,7 +61,6 @@ export default function SideMenu() {
             </div>
           </div>
 
-          {/* Links de Navegação */}
           <div className={styles.nav}>
             {menuItems.map((item, index) => (
               <div key={index} className={styles.navItem} onClick={item.action}>
@@ -61,11 +70,14 @@ export default function SideMenu() {
             ))}
           </div>
 
-          {/* Rodapé / Logout */}
           <div className={styles.footer}>
-            <button className={styles.logoutBtn}>
+            <button 
+                className={styles.logoutBtn} 
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+            >
               <LogOut size={20} />
-              <span>Sair do App</span>
+              <span>{isLoggingOut ? "Saindo..." : "Sair do App"}</span>
             </button>
           </div>
 
