@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkSession } from "../services/auth/validate/authValidateService";
+import { checkSession } from "../../services/auth/validate/validateAuth.service";
 
 export const useAuthRedirect = () => {
   const router = useRouter();

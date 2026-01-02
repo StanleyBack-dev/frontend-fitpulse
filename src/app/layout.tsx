@@ -1,18 +1,19 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "FIT PULSE | Transforme seus Dados em Resultados",
   description:
     "FIT PULSE é a sua plataforma inteligente de análise de saúde. Calcule seu IMC, acompanhe previsões de evolução e monitore sua performance física com tecnologia de ponta.",
   keywords: [
-    "fitness", 
-    "IMC", 
-    "saúde", 
-    "performance", 
-    "FIT PULSE", 
-    "calculadora fitness", 
-    "previsão corporal"
+    "fitness",
+    "IMC",
+    "saúde",
+    "performance",
+    "FIT PULSE",
+    "calculadora fitness",
+    "previsão corporal",
   ],
   authors: [{ name: "Fit Pulse Team", url: "https://fitpulse.vercel.app" }],
   icons: {
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a", 
+  themeColor: "#0a0a0a",
   colorScheme: "dark",
 };
 
@@ -66,7 +67,9 @@ export default function RootLayout({
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
-      <body className="page">{children}</body>
+      <body className="page">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

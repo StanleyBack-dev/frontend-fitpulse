@@ -1,0 +1,21 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.userInfo { display: flex; gap: 12px; align-items: center; }
+.avatar {
+  width: 45px;
+  height: 45px;
+  background: rgba(173, 255, 47, 0.1);
+  border: 1px solid #adff2f;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adff2f;
+}
+.greeting { font-size: 0.85rem; color: #888; margin: 0; }
+.statusText { font-size: 1.1rem; margin: 0; font-weight: 700; color: #fff; }
+.iconBtn { background: none; border: none; color: #666; cursor: pointer; }

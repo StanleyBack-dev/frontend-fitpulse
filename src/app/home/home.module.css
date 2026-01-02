@@ -1,0 +1,41 @@
+.container {
+  min-height: 100vh;
+  background-color: #050505;
+  color: #fff;
+  padding-bottom: 90px;
+}
+.content { padding: 24px; max-width: 600px; margin: 0 auto; }
+.sectionTitle { margin-bottom: 15px; font-size: 1rem; color: #fff; font-weight: 600; }
+.tipCard {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 20px;
+  border-radius: 20px;
+  border-left: 4px solid #adff2f;
+}
+.tipTitle { margin: 0 0 5px 0; color: #adff2f; font-size: 0.95rem; }
+.tipText { margin: 0; font-size: 0.85rem; color: #888; line-height: 1.4; }
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 75px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 100;
+}
+.navItem, .navItemActive {
+  background: none;
+  border: none;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+}
+.navItemActive { color: #adff2f; }

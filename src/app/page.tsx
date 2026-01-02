@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useAuthRedirect } from "@/hooks/useAuth";
+import { useAuthRedirect } from "@/hooks/auth/useAuth";
 import LoginButton from "../components/buttons/login.button";
 import LoadingScreen from "../components/screens/loading.screen";
 import BrowserModal from "../components/modals/browser.modal";
