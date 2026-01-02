@@ -18,6 +18,40 @@ export default function BrowserModal() {
     }
   }, []);
 
+  const handleOpenChrome = () => {
+    const currentUrl = window.location.href;
+    
+    // Remove o protocolo (http/https) para usar nos esquemas específicos
+    const rawUrl = currentUrl.replace(/^https?:\/\//, "");
+
+    // 1. Tenta o Intent do Android (Força a abertura no Chrome se instalado)
+    const intentUrl = `intent://${rawUrl}#Intent;scheme=https;package=com.android.chrome;end`;
+
+    // 2. Tenta o esquema do Chrome para iOS (googlechrome://)
+    const iosChromeUrl = `googlechrome://${rawUrl}`;
+
+    // Detecta o sistema operacional
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+      window.location.href = intentUrl;
+    } else if (isIOS) {
+      // No iOS, se o Chrome não estiver instalado, esse link falha silenciosamente.
+      // Por isso, tentamos abrir e se falhar em 500ms, avisamos ou mantemos aqui.
+      window.location.href = iosChromeUrl;
+      setTimeout(() => {
+        // Se após 1.5s ainda estiver aqui, o Chrome provavelmente não existe
+        alert("Certifique-se de que o Google Chrome está instalado no seu iPhone.");
+      }, 1500);
+    } else {
+      // Fallback para PC ou outros casos
+      window.open(currentUrl, "_blank");
+    }
+    
+    handleClose();
+  };
+
   const handleClose = () => {
     sessionStorage.setItem("hasSeenBrowserModal", "true");
     setIsVisible(false);
@@ -45,7 +79,7 @@ export default function BrowserModal() {
         </p>
 
         <div className={styles.buttonGroup}>
-          <button className={styles.primaryBtn} onClick={() => window.open(window.location.href, '_blank')}>
+          <button className={styles.primaryBtn} onClick={handleOpenChrome}>
             <Chrome size={18} />
             ABRIR NO CHROME
           </button>
