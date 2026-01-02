@@ -13,7 +13,7 @@ export default function BrowserModal() {
     const isGenericBrowser = /SamsungBrowser|Version\/.*Chrome|Version\/.*Safari|Instagram|FBAN|FBAV/i.test(userAgent);
 
     if (!hasSeenModal && isGenericBrowser) {
-      const timer = setTimeout(() => setIsVisible(true), 1500);
+      const timer = setTimeout(() => setIsVisible(true));
       return () => clearTimeout(timer);
     }
   }, []);
