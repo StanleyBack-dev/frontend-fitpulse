@@ -1,4 +1,4 @@
-import styles from "./LoadingScreen.module.css";
+import styles from "./loading.module.css";
 
 interface LoadingScreenProps {
   message?: string;

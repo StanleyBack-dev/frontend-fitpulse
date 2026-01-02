@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useAuthRedirect } from "@/hooks/useAuth";
-import LoginButton from "../components/LoginButton";
-import LoadingScreen from "../components/LoadingScreen/index";
+import LoginButton from "../components/buttons/login.button";
+import LoadingScreen from "../components/screens/loading.screen";
+import BrowserModal from "../components/modals/browser.modal";
 import styles from "./page.module.css";
 
 export default function Login() {
@@ -30,6 +31,7 @@ export default function Login() {
 
   return (
     <main className={styles.container}>
+      <BrowserModal />
       <div className={styles.blurCircle1}></div>
       <div className={styles.blurCircle2}></div>
 

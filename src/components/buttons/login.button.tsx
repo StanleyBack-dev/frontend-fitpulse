@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
-import styles from "../../app/page.module.css";
+import styles from "./login.module.css";
 
 export default function LoginButton() {
   const handleLogin = () => {

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./sidemenu.module.css";
+import styles from "./profile.module.css";
 import { 
   Menu, X, User, Calendar, Settings, 
   LogOut, Bell 
