@@ -1,13 +1,22 @@
 :root {
-  --color-bg-primary: radial-gradient(circle at center, #1a0029, #000000 80%);
-  --color-accent: #c77dff;
-  --color-accent-dark: #7b2cbf;
-  --color-accent-light: #e0b3ff;
+  /* Paleta High-Tech Fitness */
+  --color-bg-primary: #050505; /* Preto quase absoluto */
+  --color-bg-card: rgba(20, 20, 20, 0.8);
+  
+  /* Verde Lima Neon (Volt) - Cor de energia e ação */
+  --color-accent: #adff2f; 
+  --color-accent-dark: #82cc00;
+  --color-accent-light: #d4ff8a;
+  
   --color-text-primary: #ffffff;
-  --color-text-secondary: #bfbfbf;
-  --color-border: rgba(155, 64, 255, 0.4);
-  --color-overlay: rgba(255, 255, 255, 0.05);
-  --font-primary: "Poppins", sans-serif;
+  --color-text-secondary: #a0a0a0;
+  
+  /* Bordas mais sutis e tecnológicas */
+  --color-border: rgba(173, 255, 47, 0.2);
+  --color-overlay: rgba(255, 255, 255, 0.03);
+  
+  /* Tipografia mais robusta e moderna */
+  --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 html,
@@ -15,11 +24,15 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--font-primary);
-  background: var(--color-bg-primary);
+  background-color: var(--color-bg-primary);
+  /* Textura sutil de ruído para dar profundidade ao preto */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3仿真%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-attachment: fixed;
   color: var(--color-text-primary);
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Estilo padrão para containers de página */
@@ -27,37 +40,76 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
-/* Animação de brilho "pulse" */
-@keyframes pulse {
-  from {
+/* Animação de "Scan" ou Batimento (mais agressiva que a anterior) */
+@keyframes fitnessPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(173, 255, 47, 0.4);
     transform: scale(1);
-    filter: drop-shadow(0 0 10px var(--color-accent-dark));
   }
-  to {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 25px var(--color-accent-light));
+  70% {
+    box-shadow: 0 0 0 15px rgba(173, 255, 47, 0);
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(173, 255, 47, 0);
+    transform: scale(1);
   }
 }
 
-/* Links */
+/* Links com efeito de Underline moderno */
 a {
   color: var(--color-accent);
   text-decoration: none;
+  position: relative;
   transition: 0.3s;
 }
 
-a:hover {
-  text-decoration: underline;
-  color: var(--color-accent-light);
+a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--color-accent);
+  transition: width 0.3s ease;
 }
 
-/* Botões padrão */
+a:hover::after {
+  width: 100%;
+}
+
+/* Botões padrão com foco em feedback tátil */
 button {
   font-family: var(--font-primary);
   cursor: pointer;
-  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+/* Scrollbar personalizada (Estilo Dark) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
 }

@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 
 // Services
-import { logoutSession } from "../../services/authService"; 
-import { getMyUser, UserProfile } from "../../services/userService";
+import { logoutSession } from "../../services/auth/logout/authLogoutService"; 
+import { getMyUser, UserProfile } from "../../services/users/get/userGetService";
 
 export default function SideMenu() {
   const router = useRouter();

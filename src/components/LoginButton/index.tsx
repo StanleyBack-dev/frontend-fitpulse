@@ -18,7 +18,7 @@ export default function LoginButton() {
   };
 
   return (
-    <button className={styles.googleBtn} onClick={handleLogin}>
+    <button className={styles.googleBtn} >
       <FcGoogle size={24} style={{ marginRight: 8 }} />
       Entrar com Google
     </button>

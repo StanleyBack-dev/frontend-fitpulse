@@ -12,66 +12,85 @@ export default function Login() {
   const [index, setIndex] = useState(0);
   
   const slides = [
-    "O futuro do networking está aqui 🚀",
-    "Cada conexão começa com um pulso 💜",
-    "Conecte. Explore. Cresça. 🌐",
+    "Calcule seu IMC em segundos ⚡",
+    "Previsões reais para sua evolução 📈",
+    "Transforme dados em resultados 🔥",
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 3500);
+    }, 4000);
     return () => clearInterval(interval);
   }, [slides.length]);
 
   if (isLoading) {
-    return <LoadingScreen message="Verificando sua conexão..." />;
+    return <LoadingScreen message="Sincronizando seus dados vitais..." />;
   }
 
   return (
     <main className={styles.container}>
-      <div className={styles.content}>
-        <Image 
-          src="/logo-pulse.png" 
-          alt="Logo PULSE" 
-          width={180} 
-          height={180} 
-          priority 
-          className={styles.logo} 
-        />
+      <div className={styles.blurCircle1}></div>
+      <div className={styles.blurCircle2}></div>
+
+      <div className={styles.card}>
+        <header className={styles.header}>
+          <div className={styles.logoBadge}>
+            <Image 
+              src="/logo-fitpulse.png" 
+              alt="FIT PULSE" 
+              width={110} 
+              height={110} 
+              priority 
+              className={styles.logo} 
+            />
+          </div>
+          <h1 className={styles.brandName}>FIT<span>PULSE</span></h1>
+          <p className={styles.tagline}>Análises de saúde inteligentes</p>
+        </header>
         
-        <div className={styles.textGroup}>
-          <h1 className={styles.title}>Conecte-se ao PULSE</h1>
-          <div className={styles.sliderWrapper}>
-            <div 
-              className={styles.slider} 
-              style={{ transform: `translateX(-${index * 100}%)` }}
-            >
-              {slides.map((text, i) => (
-                <div key={i} className={styles.slide}>{text}</div>
-              ))}
-            </div>
+        <div className={styles.sliderContainer}>
+          <div 
+            className={styles.sliderTrack} 
+            style={{ transform: `translateX(-${index * 100}%)` }}
+          >
+            {slides.map((text, i) => (
+              <div key={i} className={styles.slideItem}>
+                <span className={styles.slideText}>{text}</span>
+              </div>
+            ))}
+          </div>
+          <div className={styles.indicators}>
+            {slides.map((_, i) => (
+              <div key={i} className={`${styles.dot} ${index === i ? styles.activeDot : ""}`}></div>
+            ))}
           </div>
         </div>
 
-        <div className={styles.buttonGroup}>
-          <LoginButton />
+        <div className={styles.actionArea}>
+          <div className={styles.googleWrapper}>
+            <LoginButton />
+          </div>
+
+          <div className={styles.divider}>
+            <span>ou continue como</span>
+          </div>
+
           <button 
-            className={styles.guestBtn} 
-            onClick={() => (window.location.href = "/home")}
+            className={styles.secondaryBtn} 
+            onClick={() => (window.location.href = "/visitors")}
           >
-            Apenas Entrar
+            Entrar como Visitante
           </button>
         </div>
-      </div>
 
-      <footer className={styles.footer}>
-        <p className={styles.termsText}>
-          Ao continuar, você concorda com os{" "}
-          <a href="/termos-de-uso" className={styles.link}>Termos de Uso</a> e a{" "}
-          <a href="/politica-de-privacidade" className={styles.link}>Política de Privacidade</a>.
-        </p>
-      </footer>
+        <footer className={styles.footer}>
+          <p>
+            Ao entrar, aceita os nossos <br />
+            <a href="/termos">Termos de Uso</a> e <a href="/privacidade">Privacidade</a>
+          </p>
+        </footer>
+      </div>
     </main>
   );
 }

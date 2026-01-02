@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkSession } from "@/services/authService";
+import { checkSession } from "../services/auth/validate/authValidateService";
 
 export const useAuthRedirect = () => {
   const router = useRouter();
@@ -11,7 +11,7 @@ export const useAuthRedirect = () => {
       try {
         const { authenticated } = await checkSession();
         if (authenticated) {
-          router.push("/home");
+          router.push("/");
         } else {
           setIsLoading(false);
         }
