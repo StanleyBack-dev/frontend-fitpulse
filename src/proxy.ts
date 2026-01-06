@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const publicRoutes = ['/', '/privacidade', '/termos', 'visitors'];
+const publicRoutes = ['/', '/privacidade', '/termos', '/visitors'];
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export async function proxy(request: NextRequest) {
