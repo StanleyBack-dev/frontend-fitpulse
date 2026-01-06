@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { refreshSession } from "../../services/auth/refresh/refreshAuth.service";
 
-export const useAuthRedirect = () => {
+export const useAuth = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
