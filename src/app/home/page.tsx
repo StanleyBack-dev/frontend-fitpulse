@@ -47,7 +47,7 @@ export default function HomePage() {
           <UserIcon size={20} />
           <span>Perfil</span>
         </button>
-        <Link href="/settings" className={styles.navItem}>
+        <Link href="/ajustes" className={styles.navItem}>
           <Settings size={20} />
           <span>Ajustes</span>
         </Link>
