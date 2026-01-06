@@ -11,7 +11,7 @@ import {
   ArrowLeft 
 } from "lucide-react";
 import styles from "./settings.module.css";
-import LogoutButton from "../../../components/buttons/logout/logout.button";
+import LogoutButton from "../../components/buttons/logout/logout.button";
 
 export default function SettingsPage() {
   const settingsGroups = [
