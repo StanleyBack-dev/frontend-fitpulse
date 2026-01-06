@@ -6,7 +6,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 // rotas públicas (não precisam de login)
 const publicRoutes = ["/", "/termos", "/privacidade", "/visitors"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, origin } = request.nextUrl;
 
   // chama o endpoint do backend que valida a sessão
