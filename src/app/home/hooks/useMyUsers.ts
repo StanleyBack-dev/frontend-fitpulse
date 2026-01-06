@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { graphqlClient } from "../../../../services/graphql/qraphqlClient";
+import { graphqlClient } from "../../../services/graphql/qraphqlClient";
 
 export interface UserProfile {
   name: string;

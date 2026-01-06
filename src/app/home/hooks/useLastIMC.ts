@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getHealth } from "../../../../services/healths/get/getHealth.service";
+import { getHealth } from "../../../services/healths/get/getHealth.service";
 
 export function useLastIMC() {
   const [data, setData] = useState<{ bmi: number; bmiStatus: string } | null>(null);
