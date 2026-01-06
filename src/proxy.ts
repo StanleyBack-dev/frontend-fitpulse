@@ -1,39 +1,44 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-// rotas públicas (sem login)
-const publicRoutes = ['/', '/privacidade', '/termos', '/visitors'];
+// rotas públicas (não precisam de login)
+const publicRoutes = ["/", "/termos", "/privacidade", "/visitors"];
 
-export async function proxy(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+export async function middleware(request: NextRequest) {
+  const { pathname, origin } = request.nextUrl;
 
-  // se a rota for pública, não faz checagem
-  if (publicRoutes.includes(path)) return NextResponse.next();
+  // chama o endpoint do backend que valida a sessão
+  const response = await fetch(`${API_BASE}/api/auth/token/refresh`, {
+    method: "POST",
+    credentials: "include",
+    headers: { Cookie: request.headers.get("cookie") || "" },
+  });
 
-  // protege apenas as rotas privadas
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/token/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { Cookie: request.headers.get('cookie') || '' },
-    });
+  const isAuthenticated = response.ok && (await response.json()).authenticated;
 
-    const data = await res.json();
-
-    // se estiver autenticado, continua
-    if (res.ok && data?.authenticated) return NextResponse.next();
-
-    // senão, manda pro login
-    return NextResponse.redirect(new URL('/', request.url));
-  } catch {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Se estiver na tela de login e estiver autenticado → manda pra /home
+  if (pathname === "/" && isAuthenticated) {
+    return NextResponse.redirect(`${origin}/home`);
   }
+
+  // Se for rota pública, deixa passar
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
+  }
+
+  // Se não estiver autenticado, redireciona pra /
+  if (!isAuthenticated) {
+    return NextResponse.redirect(`${origin}/`);
+  }
+
+  // autenticado e rota privada → segue o fluxo
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.svg$).*)",
   ],
 };

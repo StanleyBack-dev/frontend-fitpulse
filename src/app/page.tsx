@@ -2,16 +2,13 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/auth/useAuth";
 import LoginButton from "../components/buttons/login/login.button";
-import LoadingScreen from "../components/screens/loading.screen";
 import BrowserModal from "../components/modals/browser.modal";
 import styles from "./page.module.css";
 
 export default function Login() {
-  const { isLoading } = useAuth();
   const [index, setIndex] = useState(0);
-  
+
   const slides = [
     "Calcule seu IMC em segundos ⚡",
     "Previsões reais para sua evolução 📈",
@@ -25,10 +22,6 @@ export default function Login() {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  if (isLoading) {
-    return <LoadingScreen message="Sincronizando seus dados vitais..." />;
-  }
-
   return (
     <main className={styles.container}>
       <BrowserModal />
@@ -38,22 +31,24 @@ export default function Login() {
       <div className={styles.card}>
         <header className={styles.header}>
           <div className={styles.logoBadge}>
-            <Image 
-              src="/logo-fitpulse.png" 
-              alt="FIT PULSE" 
-              width={110} 
-              height={110} 
-              priority 
-              className={styles.logo} 
+            <Image
+              src="/logo-fitpulse.png"
+              alt="FIT PULSE"
+              width={110}
+              height={110}
+              priority
+              className={styles.logo}
             />
           </div>
-          <h1 className={styles.brandName}>FIT<span>PULSE</span></h1>
+          <h1 className={styles.brandName}>
+            FIT<span>PULSE</span>
+          </h1>
           <p className={styles.tagline}>Análises de saúde inteligentes</p>
         </header>
-        
+
         <div className={styles.sliderContainer}>
-          <div 
-            className={styles.sliderTrack} 
+          <div
+            className={styles.sliderTrack}
             style={{ transform: `translateX(-${index * 100}%)` }}
           >
             {slides.map((text, i) => (
@@ -64,7 +59,12 @@ export default function Login() {
           </div>
           <div className={styles.indicators}>
             {slides.map((_, i) => (
-              <div key={i} className={`${styles.dot} ${index === i ? styles.activeDot : ""}`}></div>
+              <div
+                key={i}
+                className={`${styles.dot} ${
+                  index === i ? styles.activeDot : ""
+                }`}
+              ></div>
             ))}
           </div>
         </div>
@@ -78,8 +78,8 @@ export default function Login() {
             <span>ou continue como</span>
           </div>
 
-          <button 
-            className={styles.secondaryBtn} 
+          <button
+            className={styles.secondaryBtn}
             onClick={() => (window.location.href = "/visitors")}
           >
             Entrar como Visitante
@@ -89,7 +89,8 @@ export default function Login() {
         <footer className={styles.footer}>
           <p>
             Ao entrar, aceita os nossos <br />
-            <a href="/termos">Termos de Uso</a> e <a href="/privacidade">Privacidade</a>
+            <a href="/termos">Termos de Uso</a> e{" "}
+            <a href="/privacidade">Privacidade</a>
           </p>
         </footer>
       </div>
