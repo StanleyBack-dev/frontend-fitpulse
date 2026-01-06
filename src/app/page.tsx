@@ -20,14 +20,12 @@ export default function Login() {
     "Transforme dados em resultados 🔥",
   ];
 
-  // redireciona se já estiver autenticado
   useEffect(() => {
     if (!loading && authenticated) {
       router.push("/home");
     }
   }, [loading, authenticated, router]);
 
-  // animação dos slides
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
@@ -35,7 +33,6 @@ export default function Login() {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  // renderização condicional abaixo, não antes dos hooks
   return (
     <main className={styles.container}>
       {loading ? (
