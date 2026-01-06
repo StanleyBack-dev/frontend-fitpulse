@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const token = req.cookies.get("refreshToken")?.value; // ajuste conforme o cookie de autenticação usado
 
   const isAuthPage = req.nextUrl.pathname === "/";
@@ -22,5 +22,5 @@ export function middleware(req: NextRequest) {
 
 // define as rotas onde o middleware será executado
 export const config = {
-  matcher: ["/", "/home/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/).*)"],
 };
