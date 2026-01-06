@@ -6,7 +6,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 // rotas públicas (sem login)
 const publicRoutes = ['/', '/privacidade', '/termos', '/visitors'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // se a rota for pública, não faz checagem
