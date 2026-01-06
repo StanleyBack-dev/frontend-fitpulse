@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const publicRoutes = ['/', '/politica-de-privacidade', '/termos-de-uso'];
+const publicRoutes = ['/', '/privacidade', '/termos', 'visitors'];
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export async function proxy(request: NextRequest) {
@@ -25,7 +25,6 @@ export async function proxy(request: NextRequest) {
       }
     }
   } catch {
-    // ignora erros de rede
   }
 
   return NextResponse.redirect(new URL('/', request.url));
