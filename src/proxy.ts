@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const publicRoutes = ['/', '/privacidade', '/termos', '/visitors'];
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-export async function proxy(request: NextRequest) {
+// rotas públicas (sem login)
+const publicRoutes = ['/', '/privacidade', '/termos', '/visitors'];
+
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  if (publicRoutes.includes(path)) {
-    return NextResponse.next();
-  }
+  // se a rota for pública, não faz checagem
+  if (publicRoutes.includes(path)) return NextResponse.next();
 
+  // protege apenas as rotas privadas
   try {
     const res = await fetch(`${API_BASE}/api/auth/token/refresh`, {
       method: 'POST',
@@ -18,16 +20,16 @@ export async function proxy(request: NextRequest) {
       headers: { Cookie: request.headers.get('cookie') || '' },
     });
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.authenticated) {
-        return NextResponse.next();
-      }
-    }
-  } catch {
-  }
+    const data = await res.json();
 
-  return NextResponse.redirect(new URL('/', request.url));
+    // se estiver autenticado, continua
+    if (res.ok && data?.authenticated) return NextResponse.next();
+
+    // senão, manda pro login
+    return NextResponse.redirect(new URL('/', request.url));
+  } catch {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 }
 
 export const config = {
