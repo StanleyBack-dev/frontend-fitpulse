@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useAuthRedirect } from "@/hooks/auth/useAuth";
-import LoginButton from "../components/buttons/login.button";
+import LoginButton from "../components/buttons/login/login.button";
 import LoadingScreen from "../components/screens/loading.screen";
 import BrowserModal from "../components/modals/browser.modal";
 import styles from "./page.module.css";

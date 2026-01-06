@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkSession } from "../../services/auth/validate/validateAuth.service";
+import { refreshSession } from "../../services/auth/refresh/refreshAuth.service";
 
 export const useAuthRedirect = () => {
   const router = useRouter();
@@ -9,7 +9,7 @@ export const useAuthRedirect = () => {
   useEffect(() => {
     const validate = async () => {
       try {
-        const { authenticated } = await checkSession();
+        const { authenticated } = await refreshSession();
         if (authenticated) {
           router.push("/home");
         } else {

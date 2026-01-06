@@ -1,0 +1,117 @@
+.container {
+  min-height: 100vh;
+  background-color: #050505;
+  color: #ffffff;
+  padding-bottom: 40px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 24px 20px;
+  position: sticky;
+  top: 0;
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.backBtn {
+  color: #adff2f;
+  background: rgba(173, 255, 47, 0.1);
+  padding: 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.content {
+  padding: 24px;
+}
+
+.group {
+  margin-bottom: 32px;
+}
+
+.groupTitle {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #555;
+  margin-bottom: 12px;
+  margin-left: 4px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.itemWrapper {
+  width: 100%;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s;
+}
+
+.item:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.itemLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon {
+  color: #adff2f;
+  display: flex;
+}
+
+.label {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.chevron {
+  color: #333;
+}
+
+.detail {
+  font-size: 0.85rem;
+  color: #adff2f;
+  background: rgba(173, 255, 47, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 0 20px;
+}
+
+.version {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #333;
+  margin-top: 40px;
+}

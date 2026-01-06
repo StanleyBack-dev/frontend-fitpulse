@@ -1,6 +1,6 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL; 
 
-export const checkSession = async () => {
+export const refreshSession = async () => {
   try {
 
     const res = await fetch(`${API_BASE}/api/auth/token/refresh`, {

@@ -7,6 +7,7 @@ import Menu from "./components/menu/menu";
 import { Home, BarChart2, Settings, User as UserIcon } from "lucide-react";
 import { useLastIMC } from "./hooks/useLastIMC";
 import { useMyUser } from "./hooks/useMyUsers";
+import Link from "next/link";
 
 export default function HomePage() {
   const imcData = useLastIMC();
@@ -46,10 +47,10 @@ export default function HomePage() {
           <UserIcon size={20} />
           <span>Perfil</span>
         </button>
-        <button className={styles.navItem}>
+        <Link href="/settings" className={styles.navItem}>
           <Settings size={20} />
           <span>Ajustes</span>
-        </button>
+        </Link>
       </nav>
     </main>
   );
