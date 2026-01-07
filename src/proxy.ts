@@ -33,7 +33,6 @@ export async function proxy(req: NextRequest) {
     pathname.startsWith("/ajustes") ||
     pathname.startsWith("/perfil");
 
-  // Se for rota protegida, valida token
   if (isProtectedRoute) {
     if (!token) {
       return NextResponse.redirect(new URL("/", req.url));
@@ -41,14 +40,12 @@ export async function proxy(req: NextRequest) {
 
     const valid = await validateRefreshToken(token);
     if (!valid) {
-      // limpa cookie e redireciona para login
       const res = NextResponse.redirect(new URL("/", req.url));
       res.cookies.delete("refreshToken");
       return res;
     }
   }
 
-  // Se for página de login, mas já está logado
   if (isAuthPage && token) {
     const valid = await validateRefreshToken(token);
     if (valid) {

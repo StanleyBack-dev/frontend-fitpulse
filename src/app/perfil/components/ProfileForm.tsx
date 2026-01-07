@@ -16,7 +16,12 @@ import {
 import styles from "./ProfileForm.module.css";
 import { useUpdateProfile } from "../hooks/update/useUpdateProfile";
 import { useGetProfile } from "../hooks/get/useGetProfile";
-import { calculateImc, sanitizeDecimalToInt, toDateOnly } from "@/utils/calculateImc";
+import {
+  calculateImc,
+  sanitizeDecimalToInt,
+  toDateOnly,
+} from "@/utils/calculateImc";
+import { useToast } from "@/components/toasts/ToastProvider";
 
 export default function ProfileForm() {
   const [formData, setFormData] = useState({
@@ -38,6 +43,7 @@ export default function ProfileForm() {
 
   const { updateProfile, loading, error, success } = useUpdateProfile();
   const { profile, loading: loadingGet, error: errorGet } = useGetProfile();
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     if (profile) {
@@ -54,7 +60,6 @@ export default function ProfileForm() {
       });
     }
   }, [profile]);
-
 
   useEffect(() => {
     const weight = parseInt(formData.currentWeight);
@@ -74,16 +79,26 @@ export default function ProfileForm() {
     const imcInt = sanitizeDecimalToInt(formData.currentImc) || undefined;
     const dateOnly = toDateOnly(formData.birthDate) || undefined;
 
-    await updateProfile({
-      phone: formData.phone || undefined,
-      currentWeight: weight,
-      currentHeight: height,
-      currentImc: imcInt,
-      birthDate: dateOnly,
-      sex: formData.sex,
-      activityLevel: formData.activityLevel,
-      goal: formData.goal,
-    });
+    try {
+      const result = await updateProfile({
+        phone: formData.phone || undefined,
+        currentWeight: weight,
+        currentHeight: height,
+        currentImc: imcInt,
+        birthDate: dateOnly,
+        sex: formData.sex,
+        activityLevel: formData.activityLevel,
+        goal: formData.goal,
+      });
+
+      if (result) {
+        showSuccess("Perfil atualizado com sucesso!");
+      } else {
+        showError("Não foi possível atualizar o perfil.");
+      }
+    } catch (err: any) {
+      showError(err.message || "Ocorreu um erro inesperado.");
+    }
   };
 
   const handleNumberInput = (
@@ -105,7 +120,9 @@ export default function ProfileForm() {
         <div className={styles.card}>
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Type size={20} /></span>
+              <span className={styles.icon}>
+                <Type size={20} />
+              </span>
               <input
                 className={styles.inputField}
                 placeholder="Seu nome completo"
@@ -121,7 +138,9 @@ export default function ProfileForm() {
 
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Phone size={20} /></span>
+              <span className={styles.icon}>
+                <Phone size={20} />
+              </span>
               <input
                 className={styles.inputField}
                 placeholder="Telefone (DDD)"
@@ -141,7 +160,9 @@ export default function ProfileForm() {
         <div className={styles.card}>
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Weight size={20} /></span>
+              <span className={styles.icon}>
+                <Weight size={20} />
+              </span>
               <span className={styles.label}>Peso (kg)</span>
             </div>
             <input
@@ -150,7 +171,9 @@ export default function ProfileForm() {
               className={styles.inputInline}
               placeholder="Ex: 80 kg"
               value={formData.currentWeight}
-              onChange={(e) => handleNumberInput("currentWeight", e.target.value)}
+              onChange={(e) =>
+                handleNumberInput("currentWeight", e.target.value)
+              }
             />
           </div>
 
@@ -158,7 +181,9 @@ export default function ProfileForm() {
 
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Ruler size={20} /></span>
+              <span className={styles.icon}>
+                <Ruler size={20} />
+              </span>
               <span className={styles.label}>Altura (cm)</span>
             </div>
             <input
@@ -167,7 +192,9 @@ export default function ProfileForm() {
               className={styles.inputInline}
               placeholder="Ex: 180 cm"
               value={formData.currentHeight}
-              onChange={(e) => handleNumberInput("currentHeight", e.target.value)}
+              onChange={(e) =>
+                handleNumberInput("currentHeight", e.target.value)
+              }
             />
           </div>
 
@@ -175,7 +202,9 @@ export default function ProfileForm() {
 
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Calculator size={20} /></span>
+              <span className={styles.icon}>
+                <Calculator size={20} />
+              </span>
               <span className={styles.label}>IMC</span>
             </div>
             <input
@@ -191,7 +220,9 @@ export default function ProfileForm() {
 
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Calendar size={20} /></span>
+              <span className={styles.icon}>
+                <Calendar size={20} />
+              </span>
               <span className={styles.label}>Nascimento</span>
             </div>
             <input
@@ -208,7 +239,9 @@ export default function ProfileForm() {
 
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><User size={20} /></span>
+              <span className={styles.icon}>
+                <User size={20} />
+              </span>
               <span className={styles.label}>Gênero</span>
             </div>
             <select
@@ -232,14 +265,19 @@ export default function ProfileForm() {
         <div className={styles.card}>
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Activity size={20} /></span>
+              <span className={styles.icon}>
+                <Activity size={20} />
+              </span>
               <span className={styles.label}>Atividade</span>
             </div>
             <select
               className={styles.selectField}
               value={formData.activityLevel}
               onChange={(e) =>
-                setFormData({ ...formData, activityLevel: e.target.value as any })
+                setFormData({
+                  ...formData,
+                  activityLevel: e.target.value as any,
+                })
               }
             >
               <option value="sedentary">Sedentário</option>
@@ -254,7 +292,9 @@ export default function ProfileForm() {
 
           <div className={styles.item}>
             <div className={styles.itemLeft}>
-              <span className={styles.icon}><Target size={20} /></span>
+              <span className={styles.icon}>
+                <Target size={20} />
+              </span>
               <span className={styles.label}>Objetivo</span>
             </div>
             <select
@@ -281,13 +321,6 @@ export default function ProfileForm() {
           </>
         )}
       </button>
-
-      <div className={styles.feedbackArea}>
-        {error && <p className={styles.errorText}>{error}</p>}
-        {success && (
-          <p className={styles.successText}>Perfil atualizado com sucesso!</p>
-        )}
-      </div>
     </form>
   );
 }

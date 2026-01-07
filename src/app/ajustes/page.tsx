@@ -10,7 +10,7 @@ import {
   LogOut, 
   ArrowLeft 
 } from "lucide-react";
-import styles from "./settings.module.css";
+import styles from "./ajustes.module.css";
 import LogoutButton from "../../components/buttons/logout/logout.button";
 
 export default function SettingsPage() {

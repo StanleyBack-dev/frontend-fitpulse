@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Providers } from "./providers";
+import { ToastProvider } from "@/components/toasts/ToastProvider";
 
 export const metadata: Metadata = {
   title: "FIT PULSE | Transforme seus Dados em Resultados",
@@ -68,7 +69,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="page">
-        <Providers>{children}</Providers>
+        <Providers>
+          <ToastProvider>{children}</ToastProvider>
+        </Providers>
       </body>
     </html>
   );

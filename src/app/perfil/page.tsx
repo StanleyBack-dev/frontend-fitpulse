@@ -11,7 +11,7 @@ export default function ProfilePage() {
         <button onClick={() => window.history.back()} className={styles.backBtn}>
           <ArrowLeft size={24} />
         </button>
-        <h1 className={styles.title}>Editar Perfil</h1>
+        <h1 className={styles.title}>Perfil</h1>
       </header>
 
       <ProfileForm />
