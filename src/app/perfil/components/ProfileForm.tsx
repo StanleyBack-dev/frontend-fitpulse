@@ -21,7 +21,7 @@ import {
   sanitizeDecimalToInt,
   toDateOnly,
 } from "@/utils/calculateImc";
-import { useToast } from "../../../components/toasts/toastProvider";
+import { useToast } from "../../../components/toasts/ToastProvider";
 import { useLoading } from "../../../components/screens/loading.context";
 
 export default function ProfileForm() {

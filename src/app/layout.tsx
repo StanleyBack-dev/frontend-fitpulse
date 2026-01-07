@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Providers } from "./providers";
-import { ToastProvider } from "../components/toasts/toastProvider";
+import { ToastProvider } from "../components/toasts/ToastProvider";
 import { LoadingProvider } from "../components/screens/loading.context";
 
 export const metadata: Metadata = {
