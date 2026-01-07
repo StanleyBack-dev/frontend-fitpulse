@@ -36,7 +36,7 @@ export default function Login() {
   return (
     <main className={styles.container}>
       {loading ? (
-        <LoadingScreen message="Sincronizando pontos vitais..." />
+        <LoadingScreen visible={loading} message="Sincronizando pontos vitais..." />
       ) : (
         <>
           <BrowserModal />
