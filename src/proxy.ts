@@ -1,29 +1,63 @@
+// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(req: NextRequest) {
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+async function validateRefreshToken(refreshToken: string) {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/token/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: { cookie: `refreshToken=${refreshToken}` },
+    });
+    if (!res.ok) return false;
+
+    const data = await res.json();
+    return data.authenticated;
+  } catch {
+    return false;
+  }
+}
+
+export async function proxy(req: NextRequest) {
   const env = process.env.NODE_ENV;
   const token = req.cookies.get("refreshToken")?.value;
   const { pathname } = req.nextUrl;
 
-  // 🔓 Em modo dev, não faz nenhuma validação
-  if (env === "development") {
-    return NextResponse.next();
-  }
+  if (env === "development") return NextResponse.next();
 
-  // ✅ Em produção, aplica as regras normais
   const isAuthPage = pathname === "/";
   const isProtectedRoute =
     pathname.startsWith("/home") ||
     pathname.startsWith("/ajustes") ||
     pathname.startsWith("/perfil");
 
-  if (isProtectedRoute && !token) {
-    return NextResponse.redirect(new URL("/", req.url));
+  // Se for rota protegida, valida token
+  if (isProtectedRoute) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    const valid = await validateRefreshToken(token);
+    if (!valid) {
+      // limpa cookie e redireciona para login
+      const res = NextResponse.redirect(new URL("/", req.url));
+      res.cookies.delete("refreshToken");
+      return res;
+    }
   }
 
+  // Se for página de login, mas já está logado
   if (isAuthPage && token) {
-    return NextResponse.redirect(new URL("/home", req.url));
+    const valid = await validateRefreshToken(token);
+    if (valid) {
+      return NextResponse.redirect(new URL("/home", req.url));
+    } else {
+      const res = NextResponse.next();
+      res.cookies.delete("refreshToken");
+      return res;
+    }
   }
 
   return NextResponse.next();
