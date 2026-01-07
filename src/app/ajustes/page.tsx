@@ -18,7 +18,7 @@ export default function SettingsPage() {
     {
       title: "Conta",
       items: [
-        { icon: <User size={20} />, label: "Perfil do Usuário", link: "/profile" },
+        { icon: <User size={20} />, label: "Perfil do Usuário", link: "/perfil" },
         { icon: <Scale size={20} />, label: "Unidades de Medida", detail: "kg, cm" },
       ]
     },

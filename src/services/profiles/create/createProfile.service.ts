@@ -2,7 +2,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 const GRAPHQL_ENDPOINT = `${API_URL.replace(/\/$/, '')}/graphql`;
 
 export interface CreateProfileInput {
-  idUsers: string;
   enterprise?: string;
   position?: string;
   phone?: string;
@@ -26,7 +25,6 @@ export async function createMyProfile(data: CreateProfileInput): Promise<boolean
   `;
 
   const payload = {
-    idUsers: data.idUsers,
     enterprise: data.enterprise,
     position: data.position,
     phone: data.phone,

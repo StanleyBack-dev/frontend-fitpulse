@@ -2,20 +2,26 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(req: NextRequest) {
+  const env = process.env.NODE_ENV;
   const token = req.cookies.get("refreshToken")?.value;
   const { pathname } = req.nextUrl;
 
+  // 🔓 Em modo dev, não faz nenhuma validação
+  if (env === "development") {
+    return NextResponse.next();
+  }
+
+  // ✅ Em produção, aplica as regras normais
   const isAuthPage = pathname === "/";
   const isProtectedRoute =
     pathname.startsWith("/home") ||
-    pathname.startsWith("/ajustes");
+    pathname.startsWith("/ajustes") ||
+    pathname.startsWith("/perfil");
 
-  // Bloqueia acesso a rotas privadas sem token
   if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // Se já estiver logado e tentar acessar o login → vai pra /home
   if (isAuthPage && token) {
     return NextResponse.redirect(new URL("/home", req.url));
   }
