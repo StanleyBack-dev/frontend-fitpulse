@@ -1,7 +1,8 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Providers } from "./providers";
-import { ToastProvider } from "@/components/toasts/ToastProvider";
+import { ToastProvider } from "../components/toasts/toastProvider";
+import { LoadingProvider } from "../components/screens/loading.context";
 
 export const metadata: Metadata = {
   title: "FIT PULSE | Transforme seus Dados em Resultados",
@@ -70,7 +71,11 @@ export default function RootLayout({
       </head>
       <body className="page">
         <Providers>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <LoadingProvider>
+              {children}
+            </LoadingProvider>
+          </ToastProvider>
         </Providers>
       </body>
     </html>

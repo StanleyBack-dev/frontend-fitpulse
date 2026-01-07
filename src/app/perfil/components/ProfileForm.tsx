@@ -21,9 +21,13 @@ import {
   sanitizeDecimalToInt,
   toDateOnly,
 } from "@/utils/calculateImc";
-import { useToast } from "@/components/toasts/ToastProvider";
+import { useToast } from "../../../components/toasts/toastProvider";
+import { useLoading } from "../../../components/screens/loading.context";
 
 export default function ProfileForm() {
+  const { showLoading, hideLoading } = useLoading();
+  const { showSuccess, showError } = useToast();
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -41,25 +45,30 @@ export default function ProfileForm() {
     goal: "maintain" as "lose_weight" | "maintain" | "gain_weight",
   });
 
-  const { updateProfile, loading, error, success } = useUpdateProfile();
+  const { updateProfile, loading } = useUpdateProfile();
   const { profile, loading: loadingGet, error: errorGet } = useGetProfile();
-  const { showSuccess, showError } = useToast();
 
+  // Mostra loading global enquanto busca perfil
   useEffect(() => {
-    if (profile) {
-      setFormData({
-        name: "",
-        phone: profile.phone || "",
-        currentWeight: profile.currentWeight?.toString() || "",
-        currentHeight: profile.currentHeight?.toString() || "",
-        currentImc: profile.currentImc?.toFixed(2) || "",
-        birthDate: profile.birthDate || "",
-        sex: profile.sex || "male",
-        activityLevel: profile.activityLevel || "moderate",
-        goal: profile.goal || "maintain",
-      });
+    if (loadingGet) {
+      showLoading("Carregando perfil...");
+    } else {
+      hideLoading();
+      if (profile) {
+        setFormData({
+          name: profile.name || "",
+          phone: profile.phone || "",
+          currentWeight: profile.currentWeight?.toString() || "",
+          currentHeight: profile.currentHeight?.toString() || "",
+          currentImc: profile.currentImc?.toFixed(2) || "",
+          birthDate: profile.birthDate || "",
+          sex: profile.sex || "male",
+          activityLevel: profile.activityLevel || "moderate",
+          goal: profile.goal || "maintain",
+        });
+      }
     }
-  }, [profile]);
+  }, [loadingGet, profile, showLoading, hideLoading]);
 
   useEffect(() => {
     const weight = parseInt(formData.currentWeight);
@@ -71,8 +80,10 @@ export default function ProfileForm() {
     }));
   }, [formData.currentWeight, formData.currentHeight]);
 
+  // Submit do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    showLoading("Atualizando perfil...");
 
     const weight = parseInt(formData.currentWeight) || undefined;
     const height = parseInt(formData.currentHeight) || undefined;
@@ -91,16 +102,20 @@ export default function ProfileForm() {
         goal: formData.goal,
       });
 
+      hideLoading();
+
       if (result) {
         showSuccess("Perfil atualizado com sucesso!");
       } else {
         showError("Não foi possível atualizar o perfil.");
       }
     } catch (err: any) {
+      hideLoading();
       showError(err.message || "Ocorreu um erro inesperado.");
     }
   };
 
+  // Entrada numérica para peso e altura
   const handleNumberInput = (
     field: "currentWeight" | "currentHeight",
     value: string
@@ -109,7 +124,6 @@ export default function ProfileForm() {
     if (numeric.length <= 3) setFormData({ ...formData, [field]: numeric });
   };
 
-  if (loadingGet) return <p>Carregando perfil...</p>;
   if (errorGet) return <p className={styles.errorText}>{errorGet}</p>;
 
   return (
@@ -313,13 +327,9 @@ export default function ProfileForm() {
       </section>
 
       <button type="submit" className={styles.saveBtn} disabled={loading}>
-        {loading ? (
-          "Processando..."
-        ) : (
-          <>
-            <Save size={20} /> Salvar Alterações
-          </>
-        )}
+        {!loading && <>
+          <Save size={20} /> Salvar Alterações
+        </>}
       </button>
     </form>
   );
