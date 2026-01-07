@@ -43,10 +43,10 @@ export default function HomePage() {
           <BarChart2 size={20} />
           <span>Dados</span>
         </button>
-        <button className={styles.navItem}>
+        <Link href="/perfil" className={styles.navItem}>
           <UserIcon size={20} />
           <span>Perfil</span>
-        </button>
+        </Link>
         <Link href="/ajustes" className={styles.navItem}>
           <Settings size={20} />
           <span>Ajustes</span>
