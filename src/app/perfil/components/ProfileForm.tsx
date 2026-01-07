@@ -48,7 +48,6 @@ export default function ProfileForm() {
   const { updateProfile, loading } = useUpdateProfile();
   const { profile, loading: loadingGet, error: errorGet } = useGetProfile();
 
-  // Mostra loading global enquanto busca perfil
   useEffect(() => {
     if (loadingGet) {
       showLoading("Carregando perfil...");
@@ -56,7 +55,7 @@ export default function ProfileForm() {
       hideLoading();
       if (profile) {
         setFormData({
-          name: profile.name || "",
+          name: "",
           phone: profile.phone || "",
           currentWeight: profile.currentWeight?.toString() || "",
           currentHeight: profile.currentHeight?.toString() || "",
@@ -70,6 +69,7 @@ export default function ProfileForm() {
     }
   }, [loadingGet, profile, showLoading, hideLoading]);
 
+  // Calcula IMC automaticamente quando peso ou altura mudam
   useEffect(() => {
     const weight = parseInt(formData.currentWeight);
     const height = parseInt(formData.currentHeight);
@@ -327,9 +327,11 @@ export default function ProfileForm() {
       </section>
 
       <button type="submit" className={styles.saveBtn} disabled={loading}>
-        {!loading && <>
-          <Save size={20} /> Salvar Alterações
-        </>}
+        {!loading && (
+          <>
+            <Save size={20} /> Salvar Alterações
+          </>
+        )}
       </button>
     </form>
   );
