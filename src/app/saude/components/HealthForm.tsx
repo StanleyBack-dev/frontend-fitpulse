@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Ruler, Weight, FileText, Calendar, Calculator, Save } from "lucide-react";
+import {
+  Ruler,
+  Weight,
+  FileText,
+  Calendar,
+  Calculator,
+  Save,
+  Activity,
+} from "lucide-react";
 import styles from "./HealthForm.module.css";
 import { useCreateHealth } from "../hooks/useCreateHealth";
 import { useToast } from "../../../components/toasts/ToastProvider";
@@ -26,15 +34,14 @@ export default function HealthForm() {
 
   // Cálculo automático do IMC
   useEffect(() => {
-    // Converte "1,80" -> 1.80 e "80,50" -> 80.50 para conta
-    const heightMeters = parseFormattedToNumber(formData.heightCm); 
+    const heightMeters = parseFormattedToNumber(formData.heightCm);
     const weight = parseFormattedToNumber(formData.weightKg);
 
     if (heightMeters > 0 && weight > 0) {
       const bmi = weight / Math.pow(heightMeters, 2);
       setFormData((prev) => ({
         ...prev,
-        bmi: bmi.toFixed(2).replace('.', ','), // Mostra bonito no input readonly
+        bmi: bmi.toFixed(2).replace(".", ","),
         bmiStatus: getBmiStatus(bmi),
       }));
     } else {
@@ -43,50 +50,48 @@ export default function HealthForm() {
   }, [formData.heightCm, formData.weightKg]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  showLoading("Registrando dados de saúde...");
+    e.preventDefault();
+    showLoading("Registrando...");
 
-  const rawWeight = parseFormattedToNumber(formData.weightKg);
-  const rawHeightMeters = parseFormattedToNumber(formData.heightCm);
-  const heightInCm = Math.round(rawHeightMeters * 100);
+    const rawWeight = parseFormattedToNumber(formData.weightKg);
+    const rawHeightMeters = parseFormattedToNumber(formData.heightCm);
+    const heightInCm = Math.round(rawHeightMeters * 100);
 
-  try {
-    const result = await createHealth({
-      heightCm: heightInCm,
-      weightKg: rawWeight,
-      observation: formData.observation || undefined,
-      measurementDate: formData.measurementDate,
-    });
-
-    hideLoading();
-
-    if (result) {
-      showSuccess("Registro de saúde criado com sucesso!");
-      setFormData({
-        heightCm: "",
-        weightKg: "",
-        bmi: "",
-        bmiStatus: "",
-        observation: "",
-        measurementDate: new Date().toISOString().slice(0, 10),
+    try {
+      const result = await createHealth({
+        heightCm: heightInCm,
+        weightKg: rawWeight,
+        observation: formData.observation || undefined,
+        measurementDate: formData.measurementDate,
       });
-    } else {
-      showError("Não foi possível criar o registro de saúde.");
-    }
-  } catch (err: any) {
-    hideLoading();
-    showError(err.message || "Erro inesperado ao registrar saúde.");
-  }
-};
 
+      hideLoading();
+
+      if (result) {
+        showSuccess("Medição salva!");
+        setFormData({
+          heightCm: "",
+          weightKg: "",
+          bmi: "",
+          bmiStatus: "",
+          observation: "",
+          measurementDate: new Date().toISOString().slice(0, 10),
+        });
+      } else {
+        showError("Erro ao salvar medição.");
+      }
+    } catch (err: any) {
+      hideLoading();
+      showError(err.message || "Erro inesperado.");
+    }
+  };
 
   return (
     <form className={styles.content} onSubmit={handleSubmit}>
       <section className={styles.group}>
-        <h3 className={styles.groupTitle}>Medição Corporal</h3>
+        <h3 className={styles.groupTitle}>Medidas</h3>
         <div className={styles.card}>
-          
-          {/* CAMPO DE PESO */}
+          {/* PESO */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -95,13 +100,12 @@ export default function HealthForm() {
               <span className={styles.label}>Peso (kg)</span>
             </div>
             <input
-              type="text" // Use Text para permitir vírgulas
-              inputMode="numeric" // Teclado numérico no mobile
+              type="text"
+              inputMode="decimal"
               className={styles.inputInline}
               placeholder="0,00"
               value={formData.weightKg}
               onChange={(e) => {
-                // Aplica a máscara estilo bancário (2 casas decimais)
                 const { formatted } = decimalMask(e.target.value, 2);
                 setFormData({ ...formData, weightKg: formatted });
               }}
@@ -110,7 +114,7 @@ export default function HealthForm() {
 
           <div className={styles.divider} />
 
-          {/* CAMPO DE ALTURA */}
+          {/* ALTURA */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -120,12 +124,11 @@ export default function HealthForm() {
             </div>
             <input
               type="text"
-              inputMode="numeric"
+              inputMode="decimal"
               className={styles.inputInline}
-              placeholder="0,00" // Placeholder sugere formato metros
+              placeholder="0,00"
               value={formData.heightCm}
               onChange={(e) => {
-                // Máscara com 2 casas para simular Metros (ex: 1,80)
                 const { formatted } = decimalMask(e.target.value, 2);
                 setFormData({ ...formData, heightCm: formatted });
               }}
@@ -134,7 +137,7 @@ export default function HealthForm() {
 
           <div className={styles.divider} />
 
-          {/* IMC (ReadOnly) */}
+          {/* IMC (Calculado) */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -147,38 +150,36 @@ export default function HealthForm() {
               readOnly
               className={`${styles.inputInline} ${styles.readonlyField}`}
               value={formData.bmi}
-              placeholder="Calculado"
+              placeholder="-"
             />
           </div>
 
           <div className={styles.divider} />
 
-          {/* Status (ReadOnly) */}
+          {/* STATUS (Calculado) */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
-                <FileText size={20} />
+                <Activity size={20} />
               </span>
               <span className={styles.label}>Status</span>
             </div>
-            <input
-              type="text"
-              readOnly
-              className={`${styles.inputInline} ${styles.readonlyField}`}
-              value={formData.bmiStatus}
-              placeholder="Automático"
-            />
+
+            {/* AQUI: Trocamos o Input pela Div Badge */}
+            <div className={styles.statusBadge}>
+              {formData.bmiStatus || "-"}
+            </div>
           </div>
 
           <div className={styles.divider} />
 
-          {/* Data */}
+          {/* DATA */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
                 <Calendar size={20} />
               </span>
-              <span className={styles.label}>Data da Medição</span>
+              <span className={styles.label}>Data</span>
             </div>
             <input
               type="date"
@@ -194,25 +195,23 @@ export default function HealthForm() {
 
       {/* Observações */}
       <section className={styles.group}>
-        <h3 className={styles.groupTitle}>Observações</h3>
+        <h3 className={styles.groupTitle}>Notas</h3>
         <div className={styles.card}>
-          <div className={styles.item}>
-            <div className={styles.itemLeft}>
-              <span className={styles.icon}>
-                <FileText size={20} />
-              </span>
-              <textarea
-                className={styles.textareaField}
-                placeholder="Ex: Medição feita pela manhã..."
-                value={formData.observation}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    observation: sanitizeObservation(e.target.value, 200),
-                  })
-                }
-              />
-            </div>
+          <div className={styles.item} style={{ alignItems: "flex-start" }}>
+            <span className={styles.icon} style={{ marginTop: "12px" }}>
+              <FileText size={20} />
+            </span>
+            <textarea
+              className={styles.textareaField}
+              placeholder="Alguma observação sobre hoje?"
+              value={formData.observation}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  observation: sanitizeObservation(e.target.value, 200),
+                })
+              }
+            />
           </div>
         </div>
       </section>

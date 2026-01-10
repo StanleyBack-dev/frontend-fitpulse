@@ -18,6 +18,7 @@ export default function Menu() {
       icon: <History />,
       label: "Histórico",
       color: "#fff",
+      onClick: () => router.push("/historico"),
     },
     {
       icon: <TrendingUp />,

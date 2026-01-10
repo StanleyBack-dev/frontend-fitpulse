@@ -31,7 +31,8 @@ export async function proxy(req: NextRequest) {
     pathname.startsWith("/home") ||
     pathname.startsWith("/ajustes") ||
     pathname.startsWith("/perfil") ||
-    pathname.startsWith("/saude")
+    pathname.startsWith("/saude") ||
+    pathname.startsWith("/historico")
     ;
 
   if (isProtectedRoute) {

@@ -1,0 +1,174 @@
+.container {
+  min-height: 100vh;
+  background-color: #050505;
+  color: #ffffff;
+  padding-bottom: 40px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 24px 20px;
+  position: sticky;
+  top: 0;
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.backBtn {
+  color: #adff2f;
+  background: rgba(173, 255, 47, 0.1);
+  padding: 8px;
+  border-radius: 12px;
+  border: none;
+  display: flex;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.backBtn:hover {
+  background: rgba(173, 255, 47, 0.2);
+}
+
+.backBtn:active {
+  transform: scale(0.95);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.content {
+  padding: 24px;
+}
+
+/* Agrupamento similar ao Profile */
+.group {
+  margin-bottom: 32px;
+}
+
+.groupTitle {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #555;
+  margin-bottom: 12px;
+  margin-left: 4px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Mais espaço entre cards */
+}
+
+/* Card estilo formulário */
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.01);
+  border-color: rgba(173, 255, 47, 0.3);
+}
+
+/* Itens internos */
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  gap: 12px;
+}
+
+.itemLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Ícones Neon */
+.icon {
+  color: #adff2f;
+  display: flex;
+}
+
+.arrowIcon {
+  color: #555;
+}
+
+/* Textos */
+.label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #adff2f; /* Valor em neon para destaque */
+  text-align: right;
+}
+
+/* Texto truncado para observação */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #aaa; /* Observação mais discreta */
+  font-size: 0.95rem;
+}
+
+/* Divisor igual ao profile */
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 0 20px;
+}
+
+/* Status Badges */
+.status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.good {
+  background-color: rgba(0, 255, 127, 0.15);
+  color: #00ff7f;
+  border: 1px solid rgba(0, 255, 127, 0.2);
+}
+
+.warning {
+  background-color: rgba(255, 165, 0, 0.15);
+  color: #ffa500;
+  border: 1px solid rgba(255, 165, 0, 0.2);
+}
+
+.danger {
+  background-color: rgba(255, 69, 0, 0.15);
+  color: #ff4500;
+  border: 1px solid rgba(255, 69, 0, 0.2);
+}
+
+.emptyText {
+  text-align: center;
+  color: #aaa;
+  font-size: 1rem;
+  margin-top: 40px;
+}
