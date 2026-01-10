@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -31,7 +30,9 @@ export async function proxy(req: NextRequest) {
   const isProtectedRoute =
     pathname.startsWith("/home") ||
     pathname.startsWith("/ajustes") ||
-    pathname.startsWith("/perfil");
+    pathname.startsWith("/perfil") ||
+    pathname.startsWith("/saude")
+    ;
 
   if (isProtectedRoute) {
     if (!token) {
