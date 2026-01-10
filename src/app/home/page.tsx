@@ -1,23 +1,40 @@
 "use client";
 
+import { useEffect } from "react";
 import styles from "./home.module.css";
 import Header from "./components/header/header";
 import Card from "./components/card/card";
 import Menu from "./components/menu/menu";
 import { Home, BarChart2, Settings, User as UserIcon } from "lucide-react";
+import Link from "next/link";
 import { useLastIMC } from "./hooks/useLastIMC";
 import { useMyUser } from "./hooks/useMyUsers";
-import Link from "next/link";
+import { useLoading } from "../../components/screens/loading.context"; 
 
 export default function HomePage() {
-  const imcData = useLastIMC();
-  const { user, loading } = useMyUser();
+  const { data: imcData, loading: loadingIMC } = useLastIMC();
+  const { user, loading: loadingUser } = useMyUser();
+  const { showLoading, hideLoading } = useLoading();
+
+  const isLoading = loadingIMC || loadingUser;
+
+  useEffect(() => {
+    if (isLoading) {
+      showLoading("Preparando seu painel...");
+    } else {
+      hideLoading();
+    }
+  }, [isLoading, showLoading, hideLoading]);
+
+  if (isLoading) {
+    return null; 
+  }
 
   return (
     <main className={styles.container}>
       <div className={styles.content}>
         <Header
-          userName={loading ? "Carregando..." : user?.name || "Usuário"}
+          userName={user?.name}
           userAvatar={user?.urlAvatar}
         />
 
