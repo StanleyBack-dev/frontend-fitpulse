@@ -14,11 +14,14 @@ import {
   Calculator,
 } from "lucide-react";
 import styles from "./ProfileForm.module.css";
-import { useUpdateProfile } from "../hooks/update/useUpdateProfile";
-import { useGetProfile } from "../hooks/get/useGetProfile";
-// 1. IMPORTAR O NOVO HOOK
-import { useGetUser } from "../hooks/get/useGetUser"; 
 
+// --- HOOKS ---
+import { useUpdateProfile } from "../hooks/update/useUpdateProfile"; // Update Biometria
+import { useUpdateUser } from "../hooks/update/useUpdateUser";       // Update Nome
+import { useGetProfile } from "../hooks/get/useGetProfile";          // Get Biometria
+import { useGetUser } from "../hooks/get/useGetUser";                // Get Nome
+
+// --- UTILS & CONTEXTS ---
 import {
   calculateImc,
   sanitizeDecimalToInt,
@@ -31,6 +34,7 @@ export default function ProfileForm() {
   const { showLoading, hideLoading } = useLoading();
   const { showSuccess, showError } = useToast();
 
+  // Estado do Formulário
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -43,32 +47,36 @@ export default function ProfileForm() {
     goal: "maintain" as "lose_weight" | "maintain" | "gain_weight",
   });
 
-  const { updateProfile, loading } = useUpdateProfile();
-  const { profile, loading: loadingGet, error: errorGet } = useGetProfile();
+  // --- INSTÂNCIA DOS HOOKS ---
   
-  // 2. USAR O HOOK DE USUÁRIO
-  const { user, loading: loadingUser } = useGetUser();
+  // Hooks de Escrita (Update)
+  const { updateProfile, loading: loadingProfileUpdate } = useUpdateProfile();
+  const { updateUser, loading: loadingUserUpdate } = useUpdateUser();
 
-  // Combina o loading dos dois (Perfil + Usuário)
+  // Hooks de Leitura (Get)
+  const { profile, loading: loadingGet } = useGetProfile();
+  const { user, loading: loadingUser, fetchUser } = useGetUser();
+
+  // Flags de Carregamento
   const isLoadingData = loadingGet || loadingUser;
+  const isSaving = loadingProfileUpdate || loadingUserUpdate;
 
-  // 3. EFFECT PARA PREENCHER OS DADOS AO CARREGAR
+  // 1. CARREGAR DADOS INICIAIS
   useEffect(() => {
     if (isLoadingData) {
       showLoading("Carregando perfil...");
     } else {
       hideLoading();
       
-      // Só atualiza o form se tivermos dados de perfil OU usuário
+      // Só preenche se tivermos dados de User ou Profile
       if (profile || user) {
         setFormData((prev) => ({
-          ...prev, 
+          ...prev, // Mantém o que já foi digitado caso o effect rode novamente
           
-          // --- DADOS DA CONTA (USER) ---
-          // Se o usuário veio da API, usa o nome dele.
+          // Dados do Usuário (Nome)
           name: user?.name || prev.name || "",
           
-          // --- DADOS DO PERFIL (PROFILE) ---
+          // Dados do Perfil (Biometria)
           phone: profile?.phone || prev.phone || "",
           currentWeight: profile?.currentWeight?.toString() || prev.currentWeight || "",
           currentHeight: profile?.currentHeight?.toString() || prev.currentHeight || "",
@@ -82,61 +90,73 @@ export default function ProfileForm() {
     }
   }, [isLoadingData, profile, user, showLoading, hideLoading]);
 
-  // Calcula IMC automaticamente quando peso ou altura mudam
+  // 2. CÁLCULO AUTOMÁTICO DE IMC
   useEffect(() => {
     const weight = parseInt(formData.currentWeight);
     const height = parseInt(formData.currentHeight);
     const imc = calculateImc(weight, height);
+    
     setFormData((prev) => ({
       ...prev,
       currentImc: imc ? imc.toFixed(2) : "",
     }));
   }, [formData.currentWeight, formData.currentHeight]);
 
-  // SUBMIT DO FORMULÁRIO
+  // 3. SUBMIT DO FORMULÁRIO (SALVAR TUDO)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    showLoading("Atualizando perfil...");
+    showLoading("Salvando alterações...");
 
+    // Tratamento de tipos (string -> number/date)
     const weight = parseInt(formData.currentWeight) || undefined;
     const height = parseInt(formData.currentHeight) || undefined;
     const imcInt = sanitizeDecimalToInt(formData.currentImc) || undefined;
     const dateOnly = toDateOnly(formData.birthDate) || undefined;
 
     try {
-      const result = await updateProfile({
-        phone: formData.phone || undefined,
-        currentWeight: weight,
-        currentHeight: height,
-        currentImc: imcInt,
-        birthDate: dateOnly,
-        sex: formData.sex,
-        activityLevel: formData.activityLevel,
-        goal: formData.goal,
-      });
+      // Dispara as duas atualizações em paralelo para ser mais rápido
+      const [profileResult, userResult] = await Promise.all([
+        // Atualiza tabela Profiles
+        updateProfile({
+          phone: formData.phone || undefined,
+          currentWeight: weight,
+          currentHeight: height,
+          currentImc: imcInt,
+          birthDate: dateOnly,
+          sex: formData.sex,
+          activityLevel: formData.activityLevel,
+          goal: formData.goal,
+        }),
+        // Atualiza tabela Users (Nome)
+        updateUser({
+          name: formData.name,
+        })
+      ]);
 
       hideLoading();
 
-      if (result) {
+      // Verifica sucesso
+      if (profileResult && userResult) {
         showSuccess("Perfil atualizado com sucesso!");
+        // Recarrega o usuário para garantir que o nome novo fique salvo no contexto
+        fetchUser(); 
+      } else if (!userResult) {
+         showError("Erro ao atualizar o nome. Tente novamente.");
       } else {
-        showError("Não foi possível atualizar o perfil.");
+         showError("Erro ao atualizar dados biométricos.");
       }
+
     } catch (err: any) {
       hideLoading();
       showError(err.message || "Ocorreu um erro inesperado.");
     }
   };
 
-  const handleNumberInput = (
-    field: "currentWeight" | "currentHeight",
-    value: string
-  ) => {
+  // Helper para inputs numéricos
+  const handleNumberInput = (field: "currentWeight" | "currentHeight", value: string) => {
     const numeric = value.replace(/\D/g, "");
     if (numeric.length <= 3) setFormData({ ...formData, [field]: numeric });
   };
-
-  if (errorGet) return <p className={styles.errorText}>{errorGet}</p>;
 
   return (
     <form className={styles.content} onSubmit={handleSubmit}>
@@ -156,10 +176,8 @@ export default function ProfileForm() {
                 className={styles.inputField}
                 placeholder="Seu nome completo"
                 value={formData.name}
-                // Geralmente o nome é gerido em outra rota de Account, por isso readOnly.
-                // Se quiser editar, remova o readOnly e ajuste o hook de update.
-                readOnly 
-                style={{ opacity: 0.7, cursor: 'not-allowed' }} 
+                // Habilitado para edição
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
           </div>
@@ -176,9 +194,7 @@ export default function ProfileForm() {
                 className={styles.inputField}
                 placeholder="Telefone (DDD)"
                 value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
             </div>
           </div>
@@ -204,9 +220,7 @@ export default function ProfileForm() {
               className={styles.inputInline}
               placeholder="Ex: 80"
               value={formData.currentWeight}
-              onChange={(e) =>
-                handleNumberInput("currentWeight", e.target.value)
-              }
+              onChange={(e) => handleNumberInput("currentWeight", e.target.value)}
             />
           </div>
 
@@ -226,9 +240,7 @@ export default function ProfileForm() {
               className={styles.inputInline}
               placeholder="Ex: 180"
               value={formData.currentHeight}
-              onChange={(e) =>
-                handleNumberInput("currentHeight", e.target.value)
-              }
+              onChange={(e) => handleNumberInput("currentHeight", e.target.value)}
             />
           </div>
 
@@ -265,9 +277,7 @@ export default function ProfileForm() {
               type="date"
               className={styles.inputDate}
               value={formData.birthDate}
-              onChange={(e) =>
-                setFormData({ ...formData, birthDate: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
             />
           </div>
 
@@ -284,9 +294,7 @@ export default function ProfileForm() {
             <select
               className={styles.selectField}
               value={formData.sex}
-              onChange={(e) =>
-                setFormData({ ...formData, sex: e.target.value as any })
-              }
+              onChange={(e) => setFormData({ ...formData, sex: e.target.value as any })}
             >
               <option value="male">Masculino</option>
               <option value="female">Feminino</option>
@@ -312,12 +320,7 @@ export default function ProfileForm() {
             <select
               className={styles.selectField}
               value={formData.activityLevel}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  activityLevel: e.target.value as any,
-                })
-              }
+              onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value as any })}
             >
               <option value="sedentary">Sedentário</option>
               <option value="light">Leve</option>
@@ -340,9 +343,7 @@ export default function ProfileForm() {
             <select
               className={styles.selectField}
               value={formData.goal}
-              onChange={(e) =>
-                setFormData({ ...formData, goal: e.target.value as any })
-              }
+              onChange={(e) => setFormData({ ...formData, goal: e.target.value as any })}
             >
               <option value="lose_weight">Perder Peso</option>
               <option value="maintain">Manter</option>
@@ -353,12 +354,13 @@ export default function ProfileForm() {
       </section>
 
       {/* BOTÃO SALVAR */}
-      <button type="submit" className={styles.saveBtn} disabled={loading}>
-        {!loading && (
+      <button type="submit" className={styles.saveBtn} disabled={isSaving}>
+        {!isSaving && (
           <>
             <Save size={20} /> Salvar Alterações
           </>
         )}
+        {isSaving && "Salvando..."}
       </button>
     </form>
   );
