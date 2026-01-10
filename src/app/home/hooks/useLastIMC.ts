@@ -11,13 +11,24 @@ export function useLastIMC() {
           getHealth {
             bmi
             bmiStatus
+            measurementDate
           }
         }
       `;
-      const result = await getHealth(query);
-      const list = result.getHealth;
-      if (list.length > 0) {
-        setData(list[list.length - 1]);
+      
+      try {
+        const result = await getHealth(query);
+        const list = result.getHealth;
+
+        if (list && list.length > 0) {
+          const sortedList = list.sort((a: any, b: any) => 
+            new Date(b.measurementDate).getTime() - new Date(a.measurementDate).getTime()
+          );
+
+          setData(sortedList[0]);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar último IMC:", error);
       }
     }
 

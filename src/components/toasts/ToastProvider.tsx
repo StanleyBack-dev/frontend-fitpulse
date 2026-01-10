@@ -2,6 +2,7 @@
 
 import { ReactNode, createContext, useContext, useState, useCallback } from "react";
 import Toast from "./Toast";
+import styles from "./toast.module.css";
 
 interface ToastContextProps {
   showSuccess: (msg: string) => void;
@@ -28,7 +29,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showSuccess, showError }}>
       {children}
-      <div className="toast-container">
+      
+      <div className={styles["toast-container"]}>
         {toasts.map((t) => (
           <Toast key={t.id} {...t} onRemove={removeToast} />
         ))}

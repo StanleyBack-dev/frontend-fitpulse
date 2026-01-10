@@ -88,39 +88,36 @@ export default function UpdateHealthPage({
     }
   }, [formData.heightCm, formData.weightKg]);
 
-const handleUpdate = async (e: React.FormEvent) => {
-  e.preventDefault();
-  showLoading("Atualizando...");
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    showLoading("Atualizando...");
 
-  const rawWeight = parseFormattedToNumber(formData.weightKg);
-  const rawHeightMeters = parseFormattedToNumber(formData.heightCm);
-  const heightInCm = Math.round(rawHeightMeters * 100);
+    const rawWeight = parseFormattedToNumber(formData.weightKg);
+    const rawHeightMeters = parseFormattedToNumber(formData.heightCm);
+    const heightInCm = Math.round(rawHeightMeters * 100);
 
-  const success = await updateHealth({
-    idHealth: id,
-    heightCm: heightInCm,
-    weightKg: rawWeight,
-    observation: formData.observation,
-    measurementDate: formData.measurementDate,
-  });
+    const success = await updateHealth({
+      idHealth: id,
+      heightCm: heightInCm,
+      weightKg: rawWeight,
+      observation: formData.observation,
+      measurementDate: formData.measurementDate,
+    });
 
-  if (success) {
-    // Aguarda o refresh do registro
-    const updatedRecords = await getHealth({ idHealth: id });
+    if (success) {
+      const updatedRecords = await getHealth({ idHealth: id });
 
-    hideLoading();
+      hideLoading();
 
-    if (updatedRecords.length > 0) {
-      // Agora sim mostra a mensagem
-      showSuccess("Registro atualizado!");
-      setRecordLoaded(false); // Força recarregar o formulário com os novos dados
+      if (updatedRecords.length > 0) {
+        showSuccess("Registro atualizado!");
+        setRecordLoaded(false);
+      }
+    } else {
+      hideLoading();
+      showError("Erro ao atualizar.");
     }
-  } else {
-    hideLoading();
-    showError("Erro ao atualizar.");
-  }
-};
-
+  };
 
   if (!id || loadingGet) return null;
 
