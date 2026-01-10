@@ -1,16 +1,34 @@
-import { Activity } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import styles from "./card.module.css";
 
-export default function Card({ imc = 24.5, category = "Peso Ideal" }) {
+interface CardProps {
+  label: string;
+  value: string | number;
+  unit?: string;
+  subtext?: string;
+  Icon: LucideIcon;
+  color?: string; 
+}
+
+export default function Card({ 
+  label, 
+  value, 
+  unit = "", 
+  subtext, 
+  Icon, 
+  color = "#adff2f" 
+}: CardProps) {
   return (
-    <section className={styles.summaryCard}>
+    <section className={styles.summaryCard} style={{ borderColor: `${color}40` }}>
       <div className={styles.summaryInfo}>
-        <span className={styles.label}>Seu último IMC</span>
-        <h3 className={styles.value}>{imc}</h3>
-        <p className={styles.categoryTag}>{category}</p>
+        <span className={styles.label}>{label}</span>
+        <h3 className={styles.value} style={{ color: color }}>
+          {value} <span className={styles.unit}>{unit}</span>
+        </h3>
+        {subtext && <p className={styles.categoryTag}>{subtext}</p>}
       </div>
-      <div className={styles.chartMini}>
-        <Activity size={48} className={styles.icon} />
+      <div className={styles.chartMini} style={{ background: `${color}10` }}>
+        <Icon size={28} className={styles.icon} style={{ color: color }} />
       </div>
     </section>
   );

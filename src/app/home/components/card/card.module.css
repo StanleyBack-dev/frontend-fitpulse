@@ -19,3 +19,90 @@
   display: inline-block;
 }
 .icon { color: #adff2f; opacity: 0.3; }
+
+.summaryCard {
+  /* Tamanho Fixo para forçar o scroll */
+  min-width: 85%;  /* No celular, mostra 85% da tela (dá pra ver pontinha do próximo) */
+  max-width: 320px; /* Limite para não ficar gigante em telas maiores */
+  
+  /* Impede o card de encolher */
+  flex-shrink: 0; 
+  
+  /* Alinhamento do efeito magnético */
+  scroll-snap-align: center; /* O card para no meio da tela ao soltar */
+  
+  /* Estilos Visuais (Mantenha o que já tinha) */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+/* Efeito de clique */
+.summaryCard:active {
+    transform: scale(0.98);
+}
+
+.summaryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: #aaa;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 4px 0 0 0;
+  line-height: 1;
+  color: #fff; /* Fallback */
+}
+
+.unit {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+.categoryTag {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  width: fit-content;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.chartMini {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05); /* Fallback */
+}
+
+/* Ajuste para Desktop (Telas maiores) */
+@media (min-width: 768px) {
+  .summaryCard {
+    min-width: 300px; /* Tamanho fixo em pixels no PC */
+    scroll-snap-align: start;
+  }
+}

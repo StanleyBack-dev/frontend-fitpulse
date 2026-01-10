@@ -39,3 +39,26 @@
   font-size: 0.65rem;
 }
 .navItemActive { color: #adff2f; }
+
+/* ... outros estilos ... */
+
+.cardsSlider {
+  display: flex;             /* Coloca os itens lado a lado */
+  gap: 16px;                 /* Espaço entre os cards */
+  overflow-x: auto;          /* Habilita a rolagem horizontal */
+  padding-bottom: 10px;      /* Espaço para não cortar a sombra */
+  margin-bottom: 20px;
+  
+  /* Efeito Magnético (Opcional: faz o card parar no lugar certo) */
+  scroll-snap-type: x mandatory; 
+  -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+
+  /* Para esconder a barra de rolagem feia */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Esconder barra de rolagem no Chrome/Safari */
+.cardsSlider::-webkit-scrollbar {
+  display: none;
+}

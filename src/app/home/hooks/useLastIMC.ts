@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getHealth } from "../../../services/healths/get/getHealth.service";
+import { HealthCalculator, HealthInsights } from "../../../utils/health-calculator.util";
 
 export function useLastIMC() {
-  const [data, setData] = useState<{ bmi: number; bmiStatus: string, measurementDate: string } | null>(null);
+  const [data, setData] = useState<HealthInsights | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,6 +15,8 @@ export function useLastIMC() {
             getHealth {
               bmi
               bmiStatus
+              weightKg
+              heightCm
               measurementDate
             }
           }
@@ -22,16 +25,12 @@ export function useLastIMC() {
         const result = await getHealth(query);
         const list = result.getHealth;
 
-        if (list && list.length > 0) {
-          const sortedList = list.sort((a: any, b: any) => 
-             new Date(b.measurementDate).getTime() - new Date(a.measurementDate).getTime()
-          );
-          setData(sortedList[0]);
-        } else {
-            setData(null);
-        }
+        const insights = HealthCalculator.analyzeLatest(list);
+        
+        setData(insights);
+
       } catch (error) {
-        console.error("Erro ao buscar último IMC:", error);
+        console.error("Erro ao buscar dados de saúde:", error);
         setData(null);
       } finally {
         setLoading(false);
@@ -40,5 +39,6 @@ export function useLastIMC() {
 
     fetchIMC();
   }, []);
+
   return { data, loading };
 }
