@@ -50,9 +50,7 @@ export default function UpdateHealthPage({
   }, [params]);
 
   useEffect(() => {
-    if (id) {
-      getHealth({ idHealth: id });
-    }
+    if (id) getHealth({ idHealth: id });
   }, [id]);
 
   useEffect(() => {
@@ -96,26 +94,37 @@ export default function UpdateHealthPage({
     const rawHeightMeters = parseFormattedToNumber(formData.heightCm);
     const heightInCm = Math.round(rawHeightMeters * 100);
 
-    const success = await updateHealth({
-      idHealth: id,
-      heightCm: heightInCm,
-      weightKg: rawWeight,
-      observation: formData.observation,
-      measurementDate: formData.measurementDate,
-    });
-
-    if (success) {
-      const updatedRecords = await getHealth({ idHealth: id });
+    try {
+      const updated = await updateHealth({
+        idHealth: id,
+        heightCm: heightInCm,
+        weightKg: rawWeight,
+        observation: formData.observation,
+        measurementDate: formData.measurementDate,
+      });
 
       hideLoading();
 
-      if (updatedRecords.length > 0) {
+      if (updated) {
         showSuccess("Registro atualizado!");
-        setRecordLoaded(false);
+
+        // Atualiza os campos com os novos valores retornados pela API
+        setFormData({
+          heightCm: (updated.heightCm / 100).toFixed(2).replace(".", ","),
+          weightKg: updated.weightKg.toFixed(2).replace(".", ","),
+          bmi: updated.bmi.toFixed(2).replace(".", ","),
+          bmiStatus: updated.bmiStatus,
+          observation: updated.observation || "",
+          measurementDate: new Date(updated.measurementDate)
+            .toISOString()
+            .slice(0, 10),
+        });
+      } else {
+        showError("Erro ao atualizar.");
       }
-    } else {
+    } catch (err: any) {
       hideLoading();
-      showError("Erro ao atualizar.");
+      showError(err.message || "Erro inesperado.");
     }
   };
 
@@ -205,8 +214,6 @@ export default function UpdateHealthPage({
                 </span>
                 <span className={styles.label}>Status</span>
               </div>
-
-              {/* MUDANÇA AQUI: Trocamos Input por Div para ajustar a largura */}
               <div className={styles.statusBadge}>
                 {formData.bmiStatus || "-"}
               </div>
