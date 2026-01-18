@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  ChevronRight, 
-  User, 
-  Bell, 
-  ShieldCheck, 
-  Scale, 
-  LogOut, 
-  ArrowLeft 
+import {
+  ChevronRight,
+  User,
+  Bell,
+  ShieldCheck,
+  Scale,
+  LogOut,
+  ArrowLeft
 } from "lucide-react";
 import styles from "./ajustes.module.css";
 import LogoutButton from "../../components/buttons/logout/logout.button";
@@ -19,7 +19,6 @@ export default function SettingsPage() {
       title: "Conta",
       items: [
         { icon: <User size={20} />, label: "Perfil do Usuário", link: "/perfil" },
-        { icon: <Scale size={20} />, label: "Unidades de Medida", detail: "kg, cm" },
       ]
     },
     {
@@ -48,24 +47,24 @@ export default function SettingsPage() {
             <div className={styles.card}>
               {group.items.map((item, i) => (
                 <div key={i} className={styles.itemWrapper}>
-                   {item.link ? (
-                     <Link href={item.link} className={styles.item}>
-                        <div className={styles.itemLeft}>
-                          <span className={styles.icon}>{item.icon}</span>
-                          <span className={styles.label}>{item.label}</span>
-                        </div>
-                        <ChevronRight size={18} className={styles.chevron} />
-                     </Link>
-                   ) : (
-                     <div className={styles.item}>
-                        <div className={styles.itemLeft}>
-                          <span className={styles.icon}>{item.icon}</span>
-                          <span className={styles.label}>{item.label}</span>
-                        </div>
-                        <span className={styles.detail}>{item.detail}</span>
-                     </div>
-                   )}
-                   {i < group.items.length - 1 && <div className={styles.divider} />}
+                  {item.link ? (
+                    <Link href={item.link} className={styles.item}>
+                      <div className={styles.itemLeft}>
+                        <span className={styles.icon}>{item.icon}</span>
+                        <span className={styles.label}>{item.label}</span>
+                      </div>
+                      <ChevronRight size={18} className={styles.chevron} />
+                    </Link>
+                  ) : (
+                    <div className={styles.item}>
+                      <div className={styles.itemLeft}>
+                        <span className={styles.icon}>{item.icon}</span>
+                        <span className={styles.label}>{item.label}</span>
+                      </div>
+                      <span className={styles.detail}>{item.detail}</span>
+                    </div>
+                  )}
+                  {i < group.items.length - 1 && <div className={styles.divider} />}
                 </div>
               ))}
             </div>
