@@ -10,7 +10,6 @@ interface UpdateUserInput {
 interface UpdateUserResponse {
   updateUser: {
     name: string;
-    updatedAt: string;
   };
 }
 
@@ -26,7 +25,6 @@ export function useUpdateUser() {
       mutation UpdateUser($input: UpdateUserInputDto!) {
         updateUser(input: $input) {
           name
-          updatedAt
         }
       }
     `;

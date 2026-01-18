@@ -5,28 +5,25 @@ import {
   User,
   Phone,
   Calendar,
-  Ruler,
-  Weight,
   Activity,
   Target,
   Save,
   Type,
-  Calculator,
 } from "lucide-react";
 import styles from "./ProfileForm.module.css";
 
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import ptBR from "react-phone-number-input/locale/pt-BR.json";
+
 // --- HOOKS ---
-import { useUpdateProfile } from "../hooks/update/useUpdateProfile"; // Update Biometria
-import { useUpdateUser } from "../hooks/update/useUpdateUser";       // Update Nome
-import { useGetProfile } from "../hooks/get/useGetProfile";          // Get Biometria
-import { useGetUser } from "../hooks/get/useGetUser";                // Get Nome
+import { useUpdateProfile } from "../hooks/update/useUpdateProfile";
+import { useUpdateUser } from "../hooks/update/useUpdateUser";
+import { useGetProfile } from "../hooks/get/useGetProfile";
+import { useGetUser } from "../hooks/get/useGetUser";
 
 // --- UTILS & CONTEXTS ---
-import {
-  calculateImc,
-  sanitizeDecimalToInt,
-  toDateOnly,
-} from "@/utils/calculateImc";
+import { toDateOnly } from "@/utils/calculateImc";
 import { useToast } from "../../../components/toasts/ToastProvider";
 import { useLoading } from "../../../components/screens/loading.context";
 
@@ -34,139 +31,92 @@ export default function ProfileForm() {
   const { showLoading, hideLoading } = useLoading();
   const { showSuccess, showError } = useToast();
 
-  // Estado do Formulário
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    currentWeight: "",
-    currentHeight: "",
-    currentImc: "",
     birthDate: "",
     sex: "male" as "male" | "female" | "other",
-    activityLevel: "moderate" as "sedentary" | "light" | "moderate" | "active" | "very_active",
+    activityLevel: "moderate" as
+      | "sedentary"
+      | "light"
+      | "moderate"
+      | "active"
+      | "very_active",
     goal: "maintain" as "lose_weight" | "maintain" | "gain_weight",
   });
 
-  // --- INSTÂNCIA DOS HOOKS ---
-  
-  // Hooks de Escrita (Update)
   const { updateProfile, loading: loadingProfileUpdate } = useUpdateProfile();
   const { updateUser, loading: loadingUserUpdate } = useUpdateUser();
-
-  // Hooks de Leitura (Get)
   const { profile, loading: loadingGet } = useGetProfile();
   const { user, loading: loadingUser, fetchUser } = useGetUser();
 
-  // Flags de Carregamento
   const isLoadingData = loadingGet || loadingUser;
   const isSaving = loadingProfileUpdate || loadingUserUpdate;
 
-  // 1. CARREGAR DADOS INICIAIS
   useEffect(() => {
     if (isLoadingData) {
       showLoading("Carregando perfil...");
-    } else {
-      hideLoading();
-      
-      // Só preenche se tivermos dados de User ou Profile
-      if (profile || user) {
-        setFormData((prev) => ({
-          ...prev, // Mantém o que já foi digitado caso o effect rode novamente
-          
-          // Dados do Usuário (Nome)
-          name: user?.name || prev.name || "",
-          
-          // Dados do Perfil (Biometria)
-          phone: profile?.phone || prev.phone || "",
-          currentWeight: profile?.currentWeight?.toString() || prev.currentWeight || "",
-          currentHeight: profile?.currentHeight?.toString() || prev.currentHeight || "",
-          currentImc: profile?.currentImc?.toFixed(2) || prev.currentImc || "",
-          birthDate: profile?.birthDate || prev.birthDate || "",
-          sex: profile?.sex || prev.sex || "male",
-          activityLevel: profile?.activityLevel || prev.activityLevel || "moderate",
-          goal: profile?.goal || prev.goal || "maintain",
-        }));
-      }
+      return;
+    }
+
+    hideLoading();
+
+    if (profile || user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user?.name || prev.name,
+        phone: profile?.phone || prev.phone,
+        birthDate: profile?.birthDate || prev.birthDate,
+        sex: profile?.sex || prev.sex,
+        activityLevel: profile?.activityLevel || prev.activityLevel,
+        goal: profile?.goal || prev.goal,
+      }));
     }
   }, [isLoadingData, profile, user, showLoading, hideLoading]);
 
-  // 2. CÁLCULO AUTOMÁTICO DE IMC
-  useEffect(() => {
-    const weight = parseInt(formData.currentWeight);
-    const height = parseInt(formData.currentHeight);
-    const imc = calculateImc(weight, height);
-    
-    setFormData((prev) => ({
-      ...prev,
-      currentImc: imc ? imc.toFixed(2) : "",
-    }));
-  }, [formData.currentWeight, formData.currentHeight]);
-
-  // 3. SUBMIT DO FORMULÁRIO (SALVAR TUDO)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     showLoading("Salvando alterações...");
 
-    // Tratamento de tipos (string -> number/date)
-    const weight = parseInt(formData.currentWeight) || undefined;
-    const height = parseInt(formData.currentHeight) || undefined;
-    const imcInt = sanitizeDecimalToInt(formData.currentImc) || undefined;
+    if (formData.phone && !isValidPhoneNumber(formData.phone)) {
+      hideLoading();
+      showError("Por favor, insira um número de telefone válido.");
+      return;
+    }
+
     const dateOnly = toDateOnly(formData.birthDate) || undefined;
 
     try {
-      // Dispara as duas atualizações em paralelo para ser mais rápido
       const [profileResult, userResult] = await Promise.all([
-        // Atualiza tabela Profiles
         updateProfile({
           phone: formData.phone || undefined,
-          currentWeight: weight,
-          currentHeight: height,
-          currentImc: imcInt,
           birthDate: dateOnly,
           sex: formData.sex,
           activityLevel: formData.activityLevel,
           goal: formData.goal,
         }),
-        // Atualiza tabela Users (Nome)
-        updateUser({
-          name: formData.name,
-        })
+        updateUser({ name: formData.name }),
       ]);
 
       hideLoading();
 
-      // Verifica sucesso
       if (profileResult && userResult) {
         showSuccess("Perfil atualizado com sucesso!");
-        // Recarrega o usuário para garantir que o nome novo fique salvo no contexto
-        fetchUser(); 
-      } else if (!userResult) {
-         showError("Erro ao atualizar o nome. Tente novamente.");
+        fetchUser();
       } else {
-         showError("Erro ao atualizar dados biométricos.");
+        showError("Erro ao atualizar informações.");
       }
-
     } catch (err: any) {
       hideLoading();
       showError(err.message || "Ocorreu um erro inesperado.");
     }
   };
 
-  // Helper para inputs numéricos
-  const handleNumberInput = (field: "currentWeight" | "currentHeight", value: string) => {
-    const numeric = value.replace(/\D/g, "");
-    if (numeric.length <= 3) setFormData({ ...formData, [field]: numeric });
-  };
-
   return (
     <form className={styles.content} onSubmit={handleSubmit}>
-      
-      {/* SEÇÃO 1: INFORMAÇÕES DA CONTA */}
       <section className={styles.group}>
-        <h3 className={styles.groupTitle}>Informações da Conta</h3>
+        <h3 className={styles.groupTitle}>Informações pessoais</h3>
         <div className={styles.card}>
-          
-          {/* CAMPO NOME */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -176,96 +126,39 @@ export default function ProfileForm() {
                 className={styles.inputField}
                 placeholder="Seu nome completo"
                 value={formData.name}
-                // Habilitado para edição
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
             </div>
           </div>
 
           <div className={styles.divider} />
 
-          {/* CAMPO TELEFONE */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
                 <Phone size={20} />
               </span>
-              <input
-                className={styles.inputField}
-                placeholder="Telefone (DDD)"
+              <PhoneInput
+                international
+                defaultCountry="BR"
+                labels={ptBR}
+                placeholder="Telefone"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(value) =>
+                  setFormData({ ...formData, phone: value || "" })
+                }
+                numberInputProps={{
+                  className: styles.inputPhoneReset
+                }}
+                className={styles.phoneContainerLib}
               />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* SEÇÃO 2: BIOMETRIA */}
-      <section className={styles.group}>
-        <h3 className={styles.groupTitle}>Biometria</h3>
-        <div className={styles.card}>
-          
-          {/* PESO */}
-          <div className={styles.item}>
-            <div className={styles.itemLeft}>
-              <span className={styles.icon}>
-                <Weight size={20} />
-              </span>
-              <span className={styles.label}>Peso (kg)</span>
-            </div>
-            <input
-              type="text"
-              inputMode="numeric"
-              className={styles.inputInline}
-              placeholder="Ex: 80"
-              value={formData.currentWeight}
-              onChange={(e) => handleNumberInput("currentWeight", e.target.value)}
-            />
-          </div>
 
           <div className={styles.divider} />
 
-          {/* ALTURA */}
-          <div className={styles.item}>
-            <div className={styles.itemLeft}>
-              <span className={styles.icon}>
-                <Ruler size={20} />
-              </span>
-              <span className={styles.label}>Altura (cm)</span>
-            </div>
-            <input
-              type="text"
-              inputMode="numeric"
-              className={styles.inputInline}
-              placeholder="Ex: 180"
-              value={formData.currentHeight}
-              onChange={(e) => handleNumberInput("currentHeight", e.target.value)}
-            />
-          </div>
-
-          <div className={styles.divider} />
-
-          {/* IMC (Calculado) */}
-          <div className={styles.item}>
-            <div className={styles.itemLeft}>
-              <span className={styles.icon}>
-                <Calculator size={20} />
-              </span>
-              <span className={styles.label}>IMC</span>
-            </div>
-            <input
-              type="text"
-              readOnly
-              className={`${styles.inputInline} ${styles.readonlyField}`}
-              placeholder="Auto"
-              value={formData.currentImc}
-            />
-          </div>
-
-          <div className={styles.divider} />
-
-          {/* DATA NASCIMENTO */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -277,13 +170,14 @@ export default function ProfileForm() {
               type="date"
               className={styles.inputDate}
               value={formData.birthDate}
-              onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, birthDate: e.target.value })
+              }
             />
           </div>
 
           <div className={styles.divider} />
 
-          {/* GÊNERO */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -294,7 +188,9 @@ export default function ProfileForm() {
             <select
               className={styles.selectField}
               value={formData.sex}
-              onChange={(e) => setFormData({ ...formData, sex: e.target.value as any })}
+              onChange={(e) =>
+                setFormData({ ...formData, sex: e.target.value as any })
+              }
             >
               <option value="male">Masculino</option>
               <option value="female">Feminino</option>
@@ -304,12 +200,9 @@ export default function ProfileForm() {
         </div>
       </section>
 
-      {/* SEÇÃO 3: PLANEJAMENTO */}
       <section className={styles.group}>
         <h3 className={styles.groupTitle}>Planejamento</h3>
         <div className={styles.card}>
-          
-          {/* NÍVEL DE ATIVIDADE */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -320,7 +213,12 @@ export default function ProfileForm() {
             <select
               className={styles.selectField}
               value={formData.activityLevel}
-              onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value as any })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  activityLevel: e.target.value as any,
+                })
+              }
             >
               <option value="sedentary">Sedentário</option>
               <option value="light">Leve</option>
@@ -332,7 +230,6 @@ export default function ProfileForm() {
 
           <div className={styles.divider} />
 
-          {/* OBJETIVO */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -343,7 +240,9 @@ export default function ProfileForm() {
             <select
               className={styles.selectField}
               value={formData.goal}
-              onChange={(e) => setFormData({ ...formData, goal: e.target.value as any })}
+              onChange={(e) =>
+                setFormData({ ...formData, goal: e.target.value as any })
+              }
             >
               <option value="lose_weight">Perder Peso</option>
               <option value="maintain">Manter</option>
@@ -353,14 +252,8 @@ export default function ProfileForm() {
         </div>
       </section>
 
-      {/* BOTÃO SALVAR */}
       <button type="submit" className={styles.saveBtn} disabled={isSaving}>
-        {!isSaving && (
-          <>
-            <Save size={20} /> Salvar Alterações
-          </>
-        )}
-        {isSaving && "Salvando..."}
+        {isSaving ? "Salvando..." : <><Save size={20} /> Salvar Alterações</>}
       </button>
     </form>
   );

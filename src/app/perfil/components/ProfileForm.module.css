@@ -2,7 +2,6 @@
   padding: 24px;
 }
 
-/* Agrupamentos de seções */
 .group {
   margin-bottom: 32px;
 }
@@ -16,7 +15,6 @@
   margin-left: 4px;
 }
 
-/* Cartões de grupo */
 .card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -24,7 +22,6 @@
   overflow: hidden;
 }
 
-/* Linhas de item dentro do cartão */
 .item {
   display: flex;
   align-items: center;
@@ -50,14 +47,12 @@
   color: #fff;
 }
 
-/* Separadores visuais */
 .divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.05);
   margin: 0 20px;
 }
 
-/* Campos de entrada */
 .inputField {
   background: transparent;
   border: none;
@@ -100,7 +95,6 @@
   cursor: pointer;
 }
 
-/* Botão de salvar */
 .saveBtn {
   width: 100%;
   display: flex;
@@ -126,4 +120,24 @@
 .saveBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.phoneContainerLib {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.inputPhoneReset {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px;
+  font-size: 1rem;
+  color: inherit;
+}
+
+.phoneContainerLib :global(.PhoneInputCountry) {
+  margin-right: 10px;
 }
