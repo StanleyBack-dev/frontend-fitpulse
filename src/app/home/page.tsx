@@ -7,7 +7,7 @@ import Card from "./components/card/card";
 import Menu from "./components/menu/menu";
 import TipsCarousel from "./components/tips/TipsCarousel";
 import {
-  Home, BarChart2, Settings, User as UserIcon,
+  Home, Settings, User as UserIcon,
   Activity, Weight, Target, Utensils, TrendingUp, TrendingDown, Minus,
   History, ShoppingBag
 } from "lucide-react";
