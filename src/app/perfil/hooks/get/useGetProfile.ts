@@ -9,6 +9,7 @@ interface GetProfileResponse {
     phone?: string;
     birthDate?: string;
     sex?: 'male' | 'female' | 'other';
+    heightM?: number;
     activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
     goal?: 'lose_weight' | 'maintain' | 'gain_weight';
   };
@@ -30,6 +31,7 @@ export function useGetProfile() {
           phone
           birthDate
           sex
+          heightM
           activityLevel
           goal
         }

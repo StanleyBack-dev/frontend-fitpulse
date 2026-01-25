@@ -2,40 +2,53 @@
 
 import { useState, useEffect } from "react";
 import {
-  Ruler,
   Weight,
   FileText,
   Calendar,
   Calculator,
   Save,
   Activity,
+  Ruler,
 } from "lucide-react";
 import styles from "./HealthForm.module.css";
 import { useCreateHealth } from "../hooks/useCreateHealth";
+import { useUpdateProfile } from "../../perfil/hooks/update/useUpdateProfile";
 import { useToast } from "../../../components/toasts/ToastProvider";
 import { useLoading } from "../../../components/screens/loading.context";
 import { getBmiStatus } from "../../../utils/getBmiStatus";
 import { sanitizeObservation } from "../../../utils/inputFormt.util";
 import { decimalMask, parseFormattedToNumber } from "../../../utils/mask.util";
+import { useGetProfile } from "../../perfil/hooks/get/useGetProfile";
 
 export default function HealthForm() {
   const { createHealth, loading } = useCreateHealth();
+  const { updateProfile } = useUpdateProfile();
   const { showSuccess, showError } = useToast();
   const { showLoading, hideLoading } = useLoading();
+  const { profile, fetchProfile, loading: loadingProfile } = useGetProfile();
 
   const [formData, setFormData] = useState({
-    heightCm: "",
     weightKg: "",
+    heightM: "",
     bmi: "",
     bmiStatus: "",
     observation: "",
     measurementDate: new Date().toISOString().slice(0, 10),
   });
 
-  // Cálculo automático do IMC
   useEffect(() => {
-    const heightMeters = parseFormattedToNumber(formData.heightCm);
+    if (profile?.heightM) {
+      const meters = profile.heightM.toFixed(2).replace(".", ",");
+      setFormData((prev) => ({
+        ...prev,
+        heightM: meters,
+      }));
+    }
+  }, [profile?.heightM]);
+
+  useEffect(() => {
     const weight = parseFormattedToNumber(formData.weightKg);
+    const heightMeters = parseFormattedToNumber(formData.heightM);
 
     if (heightMeters > 0 && weight > 0) {
       const bmi = weight / Math.pow(heightMeters, 2);
@@ -47,19 +60,26 @@ export default function HealthForm() {
     } else {
       setFormData((prev) => ({ ...prev, bmi: "", bmiStatus: "" }));
     }
-  }, [formData.heightCm, formData.weightKg]);
+  }, [formData.weightKg, formData.heightM]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    showLoading("Registrando...");
 
     const rawWeight = parseFormattedToNumber(formData.weightKg);
-    const rawHeightMeters = parseFormattedToNumber(formData.heightCm);
-    const heightInCm = Math.round(rawHeightMeters * 100);
+    const rawHeightMeters = parseFormattedToNumber(formData.heightM);
+    await updateProfile({ heightM: rawHeightMeters });
+
+    if (!rawHeightMeters || rawHeightMeters <= 0) {
+      showError("Informe sua altura antes de registrar a medição.");
+      return;
+    }
+
+    showLoading("Registrando...");
 
     try {
+      await updateProfile({ heightM: rawHeightMeters });
+
       const result = await createHealth({
-        heightCm: heightInCm,
         weightKg: rawWeight,
         observation: formData.observation || undefined,
         measurementDate: formData.measurementDate,
@@ -68,9 +88,10 @@ export default function HealthForm() {
       hideLoading();
 
       if (result) {
-        showSuccess("Medição salva!");
+        showSuccess("Altura e medição salvas com sucesso!");
+        await fetchProfile();
         setFormData({
-          heightCm: "",
+          ...formData,
           weightKg: "",
           bmi: "",
           bmiStatus: "",
@@ -82,9 +103,19 @@ export default function HealthForm() {
       }
     } catch (err: any) {
       hideLoading();
-      showError(err.message || "Erro inesperado.");
+
+      const backendMessage =
+        err?.response?.errors?.[0]?.message ||
+        err?.message ||
+        "Erro inesperado ao salvar medição.";
+
+      showError(backendMessage);
     }
   };
+
+  if (loadingProfile) {
+    return <p className={styles.loadingText}>Carregando perfil...</p>;
+  }
 
   return (
     <form className={styles.content} onSubmit={handleSubmit}>
@@ -127,17 +158,17 @@ export default function HealthForm() {
               inputMode="decimal"
               className={styles.inputInline}
               placeholder="0,00"
-              value={formData.heightCm}
+              value={formData.heightM}
               onChange={(e) => {
                 const { formatted } = decimalMask(e.target.value, 2);
-                setFormData({ ...formData, heightCm: formatted });
+                setFormData({ ...formData, heightM: formatted });
               }}
             />
           </div>
 
           <div className={styles.divider} />
 
-          {/* IMC (Calculado) */}
+          {/* IMC */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -156,7 +187,7 @@ export default function HealthForm() {
 
           <div className={styles.divider} />
 
-          {/* STATUS (Calculado) */}
+          {/* STATUS */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -164,8 +195,6 @@ export default function HealthForm() {
               </span>
               <span className={styles.label}>Status</span>
             </div>
-
-            {/* AQUI: Trocamos o Input pela Div Badge */}
             <div className={styles.statusBadge}>
               {formData.bmiStatus || "-"}
             </div>
@@ -193,7 +222,7 @@ export default function HealthForm() {
         </div>
       </section>
 
-      {/* Observações */}
+      {/* OBSERVAÇÕES */}
       <section className={styles.group}>
         <h3 className={styles.groupTitle}>Notas</h3>
         <div className={styles.card}>

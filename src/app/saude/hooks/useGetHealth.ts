@@ -5,7 +5,6 @@ import { graphqlClient } from "../../../services/graphql/qraphqlClient";
 
 interface HealthRecord {
   idHealth: string;
-  heightCm: number;
   weightKg: number;
   bmi: number;
   bmiStatus: string;
@@ -40,7 +39,6 @@ export function useGetHealth() {
       query GetHealth($input: GetHealthInputDto) {
         getHealth(input: $input) {
           idHealth
-          heightCm
           weightKg
           bmi
           bmiStatus

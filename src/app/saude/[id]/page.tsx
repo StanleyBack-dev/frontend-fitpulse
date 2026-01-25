@@ -16,6 +16,8 @@ import { useRouter } from "next/navigation";
 import styles from "../components/HealthForm.module.css";
 import { useUpdateHealth } from "../hooks/useUpdateHealth";
 import { useGetHealth } from "../hooks/useGetHealth";
+import { useUpdateProfile } from "../../perfil/hooks/update/useUpdateProfile";
+import { useGetProfile } from "../../perfil/hooks/get/useGetProfile";
 import { useToast } from "../../../components/toasts/ToastProvider";
 import { useLoading } from "../../../components/screens/loading.context";
 import { decimalMask, parseFormattedToNumber } from "../../../utils/mask.util";
@@ -33,11 +35,13 @@ export default function UpdateHealthPage({
   const router = useRouter();
   const { updateHealth, loading: loadingUpdate } = useUpdateHealth();
   const { getHealth, records, loading: loadingGet } = useGetHealth();
+  const { updateProfile } = useUpdateProfile();
+  const { profile, fetchProfile, loading: loadingProfile } = useGetProfile();
   const { showSuccess, showError } = useToast();
   const { showLoading, hideLoading } = useLoading();
 
   const [formData, setFormData] = useState({
-    heightCm: "",
+    heightM: "",
     weightKg: "",
     bmi: "",
     bmiStatus: "",
@@ -45,35 +49,48 @@ export default function UpdateHealthPage({
     measurementDate: "",
   });
 
+  // Pega o ID da URL
   useEffect(() => {
     params.then((p) => setId(p.id));
   }, [params]);
 
+  // Busca o registro de saúde específico
   useEffect(() => {
     if (id) getHealth({ idHealth: id });
   }, [id]);
 
+  // Quando o perfil for carregado, define a altura inicial
+  useEffect(() => {
+    const height = profile?.heightM;
+    if (height && !formData.heightM) {
+      setFormData((prev) => ({
+        ...prev,
+        heightM: height.toFixed(2).replace(".", ","),
+      }));
+    }
+  }, [profile?.heightM]);
+
+  // Quando o registro for carregado, preenche os dados
   useEffect(() => {
     if (!recordLoaded && records.length > 0) {
       const record = records[0];
-      if (record) {
-        setFormData({
-          heightCm: (record.heightCm / 100).toFixed(2).replace(".", ","),
-          weightKg: record.weightKg.toFixed(2).replace(".", ","),
-          bmi: record.bmi.toFixed(2).replace(".", ","),
-          bmiStatus: record.bmiStatus,
-          observation: record.observation || "",
-          measurementDate: new Date(record.measurementDate)
-            .toISOString()
-            .slice(0, 10),
-        });
-        setRecordLoaded(true);
-      }
+      setFormData((prev) => ({
+        ...prev,
+        weightKg: record.weightKg.toFixed(2).replace(".", ","),
+        bmi: record.bmi.toFixed(2).replace(".", ","),
+        bmiStatus: record.bmiStatus,
+        observation: record.observation || "",
+        measurementDate: new Date(record.measurementDate)
+          .toISOString()
+          .slice(0, 10),
+      }));
+      setRecordLoaded(true);
     }
   }, [records, recordLoaded]);
 
+  // Calcula IMC automaticamente
   useEffect(() => {
-    const heightMeters = parseFormattedToNumber(formData.heightCm);
+    const heightMeters = parseFormattedToNumber(formData.heightM);
     const weight = parseFormattedToNumber(formData.weightKg);
 
     if (heightMeters > 0 && weight > 0) {
@@ -84,33 +101,41 @@ export default function UpdateHealthPage({
         bmiStatus: getBmiStatus(bmi),
       }));
     }
-  }, [formData.heightCm, formData.weightKg]);
+  }, [formData.heightM, formData.weightKg]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    showLoading("Atualizando...");
 
     const rawWeight = parseFormattedToNumber(formData.weightKg);
-    const rawHeightMeters = parseFormattedToNumber(formData.heightCm);
-    const heightInCm = Math.round(rawHeightMeters * 100);
+    const rawHeightMeters = parseFormattedToNumber(formData.heightM);
+
+    if (!rawHeightMeters || rawHeightMeters <= 0) {
+      showError("Informe sua altura antes de atualizar a medição.");
+      return;
+    }
+
+    showLoading("Atualizando...");
 
     try {
+      // 1️⃣ Atualiza a altura no perfil
+      await updateProfile({ heightM: rawHeightMeters });
+
+      // 2️⃣ Atualiza o registro de saúde
       const updated = await updateHealth({
         idHealth: id,
-        heightCm: heightInCm,
         weightKg: rawWeight,
-        observation: formData.observation,
+        observation: formData.observation || undefined,
         measurementDate: formData.measurementDate,
       });
 
       hideLoading();
 
       if (updated) {
-        showSuccess("Registro atualizado!");
+        showSuccess("Medição atualizada com sucesso!");
+        await fetchProfile();
 
-        // Atualiza os campos com os novos valores retornados pela API
         setFormData({
-          heightCm: (updated.heightCm / 100).toFixed(2).replace(".", ","),
+          heightM: rawHeightMeters.toFixed(2).replace(".", ","),
           weightKg: updated.weightKg.toFixed(2).replace(".", ","),
           bmi: updated.bmi.toFixed(2).replace(".", ","),
           bmiStatus: updated.bmiStatus,
@@ -120,15 +145,19 @@ export default function UpdateHealthPage({
             .slice(0, 10),
         });
       } else {
-        showError("Erro ao atualizar.");
+        showError("Erro ao atualizar a medição.");
       }
     } catch (err: any) {
       hideLoading();
-      showError(err.message || "Erro inesperado.");
+      const backendMessage =
+        err?.response?.errors?.[0]?.message ||
+        err?.message ||
+        "Erro inesperado ao atualizar medição.";
+      showError(backendMessage);
     }
   };
 
-  if (!id || loadingGet) return null;
+  if (!id || loadingGet || loadingProfile) return null;
 
   return (
     <main className={styles.container}>
@@ -176,11 +205,11 @@ export default function UpdateHealthPage({
               </div>
               <input
                 className={styles.inputInline}
-                value={formData.heightCm}
+                value={formData.heightM}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    heightCm: decimalMask(e.target.value, 2).formatted,
+                    heightM: decimalMask(e.target.value, 2).formatted,
                   })
                 }
                 inputMode="decimal"
@@ -264,17 +293,13 @@ export default function UpdateHealthPage({
           </div>
         </section>
 
-        <button
-          type="submit"
-          className={styles.saveBtn}
-          disabled={loadingUpdate}
-        >
-          {loadingUpdate ? (
-            "Salvando..."
-          ) : (
+        <button type="submit" className={styles.saveBtn} disabled={loadingUpdate}>
+          {!loadingUpdate ? (
             <>
-              <Save size={20} /> Atualizar
+              <Save size={20} /> Atualizar Medição
             </>
+          ) : (
+            "Salvando..."
           )}
         </button>
 

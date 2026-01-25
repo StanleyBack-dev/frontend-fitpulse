@@ -9,6 +9,7 @@ interface UpdateProfileInput {
   sex?: 'male' | 'female' | 'other';
   activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   goal?: 'lose_weight' | 'maintain' | 'gain_weight';
+  heightM?: number;
 }
 
 interface UpdateProfileResponse {
@@ -19,6 +20,7 @@ interface UpdateProfileResponse {
     sex?: 'male' | 'female' | 'other';
     activityLevel?: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
     goal?: 'lose_weight' | 'maintain' | 'gain_weight';
+    heightM?: number;
   };
 }
 
@@ -41,6 +43,7 @@ export function useUpdateProfile() {
           sex
           activityLevel
           goal
+          heightM
         }
       }
     `;

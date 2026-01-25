@@ -9,6 +9,7 @@ import {
   Target,
   Save,
   Type,
+  Ruler,
 } from "lucide-react";
 import styles from "./ProfileForm.module.css";
 
@@ -16,16 +17,15 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import ptBR from "react-phone-number-input/locale/pt-BR.json";
 
-// --- HOOKS ---
 import { useUpdateProfile } from "../hooks/update/useUpdateProfile";
 import { useUpdateUser } from "../hooks/update/useUpdateUser";
 import { useGetProfile } from "../hooks/get/useGetProfile";
 import { useGetUser } from "../hooks/get/useGetUser";
 
-// --- UTILS & CONTEXTS ---
 import { toDateOnly } from "@/utils/calculateImc";
 import { useToast } from "../../../components/toasts/ToastProvider";
 import { useLoading } from "../../../components/screens/loading.context";
+import { decimalMask, parseFormattedToNumber } from "@/utils/mask.util";
 
 export default function ProfileForm() {
   const { showLoading, hideLoading } = useLoading();
@@ -36,6 +36,7 @@ export default function ProfileForm() {
     phone: "",
     birthDate: "",
     sex: "male" as "male" | "female" | "other",
+    heightM: "",
     activityLevel: "moderate" as
       | "sedentary"
       | "light"
@@ -68,6 +69,9 @@ export default function ProfileForm() {
         phone: profile?.phone || prev.phone,
         birthDate: profile?.birthDate || prev.birthDate,
         sex: profile?.sex || prev.sex,
+        heightM: profile?.heightM
+          ? profile.heightM.toFixed(2).replace(".", ",")
+          : prev.heightM,
         activityLevel: profile?.activityLevel || prev.activityLevel,
         goal: profile?.goal || prev.goal,
       }));
@@ -85,6 +89,7 @@ export default function ProfileForm() {
     }
 
     const dateOnly = toDateOnly(formData.birthDate) || undefined;
+    const rawHeight = parseFormattedToNumber(formData.heightM);
 
     try {
       const [profileResult, userResult] = await Promise.all([
@@ -92,6 +97,7 @@ export default function ProfileForm() {
           phone: formData.phone || undefined,
           birthDate: dateOnly,
           sex: formData.sex,
+          heightM: rawHeight || undefined,
           activityLevel: formData.activityLevel,
           goal: formData.goal,
         }),
@@ -114,9 +120,11 @@ export default function ProfileForm() {
 
   return (
     <form className={styles.content} onSubmit={handleSubmit}>
+      {/* INFORMAÇÕES PESSOAIS */}
       <section className={styles.group}>
         <h3 className={styles.groupTitle}>Informações pessoais</h3>
         <div className={styles.card}>
+          {/* NOME */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -135,6 +143,7 @@ export default function ProfileForm() {
 
           <div className={styles.divider} />
 
+          {/* TELEFONE */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -150,7 +159,7 @@ export default function ProfileForm() {
                   setFormData({ ...formData, phone: value || "" })
                 }
                 numberInputProps={{
-                  className: styles.inputPhoneReset
+                  className: styles.inputPhoneReset,
                 }}
                 className={styles.phoneContainerLib}
               />
@@ -159,6 +168,7 @@ export default function ProfileForm() {
 
           <div className={styles.divider} />
 
+          {/* NASCIMENTO */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -178,6 +188,7 @@ export default function ProfileForm() {
 
           <div className={styles.divider} />
 
+          {/* GÊNERO */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -197,12 +208,37 @@ export default function ProfileForm() {
               <option value="other">Outro</option>
             </select>
           </div>
+
+          <div className={styles.divider} />
+
+          {/* ALTURA */}
+          <div className={styles.item}>
+            <div className={styles.itemLeft}>
+              <span className={styles.icon}>
+                <Ruler size={20} />
+              </span>
+              <span className={styles.label}>Altura (m)</span>
+            </div>
+            <input
+              type="text"
+              inputMode="decimal"
+              className={styles.inputInline}
+              placeholder="0,00"
+              value={formData.heightM}
+              onChange={(e) => {
+                const { formatted } = decimalMask(e.target.value, 2);
+                setFormData({ ...formData, heightM: formatted });
+              }}
+            />
+          </div>
         </div>
       </section>
 
+      {/* PLANEJAMENTO */}
       <section className={styles.group}>
         <h3 className={styles.groupTitle}>Planejamento</h3>
         <div className={styles.card}>
+          {/* NÍVEL DE ATIVIDADE */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>
@@ -230,6 +266,7 @@ export default function ProfileForm() {
 
           <div className={styles.divider} />
 
+          {/* OBJETIVO */}
           <div className={styles.item}>
             <div className={styles.itemLeft}>
               <span className={styles.icon}>

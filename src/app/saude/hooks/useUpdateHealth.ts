@@ -5,7 +5,6 @@ import { graphqlClient } from "../../../services/graphql/qraphqlClient";
 
 interface UpdateHealthInput {
   idHealth: string;
-  heightCm?: number;
   weightKg?: number;
   observation?: string;
   measurementDate?: string;
@@ -14,7 +13,6 @@ interface UpdateHealthInput {
 interface UpdateHealthResponse {
   updateHealth: {
     idHealth: string;
-    heightCm: number;
     weightKg: number;
     bmi: number;
     bmiStatus: string;
@@ -38,7 +36,6 @@ export function useUpdateHealth() {
       mutation UpdateHealth($input: UpdateHealthInputDto!) {
         updateHealth(input: $input) {
           idHealth
-          heightCm
           weightKg
           bmi
           bmiStatus
